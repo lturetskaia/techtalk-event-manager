@@ -15,9 +15,11 @@ export default [
       route('settings', './routes/organiser/settings.tsx'),
     ]),
   ]),
-  route('events', './routes/events.tsx'),
-  ...prefix('user', [
-    route('my-bookings', './routes/user/bookings.tsx'),
-    route('profile', './routes/user/profile.tsx'),
+  ...prefix('attendee', [
+    layout('./routes/attendee/attendeeMenu.tsx', [
+      route('events', './routes/attendee/events.tsx'),
+      route('my-bookings', './routes/attendee/bookings.tsx'),
+      route('profile', './routes/attendee/profile.tsx'),
+    ]),
   ]),
 ] satisfies RouteConfig;

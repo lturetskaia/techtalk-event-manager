@@ -20,7 +20,7 @@ export default function Main() {
           title="For Attendees"
           description="Browse thousands of events, secure tickets instantly, and track your tech learning journey."
           btnText="Enter Attendee Hub"
-          path="/events"
+          path="/attendee/events"
         />
         <BtnCard
           title="For Organisers"
