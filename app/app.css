@@ -92,25 +92,18 @@ h1 {
   padding: 0.65rem 1.1rem;
   font-size: 1.2rem;
 }
-/* h1 {
-  text-align: center;
-  padding: 2rem 0;
-  margin: 0;
-  font-size: 3rem;
-  font-family: 'Roboto Flex', sans-serif;
-} */
 
-/* h2 {
+h2 {
   text-align: center;
   margin: 2rem 0;
   font-family: 'Tektur', sans-serif;
   color: var(--text-secondary);
-} */
+}
 
-/* h3 {
+h3 {
   font-size: 1.6rem;
   font-family: 'Tektur', sans-serif;
-} */
+}
 
 a {
   color: var(--text-primary);
@@ -131,7 +124,7 @@ footer p {
   margin: 0;
 }
 
-/* .card-container {
+.card-container {
   position: relative;
   margin: 2rem 0 3rem 0;
   display: flex;
@@ -145,7 +138,6 @@ footer p {
   padding-left: 1.5rem;
   height: max-content;
 }
-  */
 
 .card {
   display: flex;
@@ -157,25 +149,26 @@ footer p {
   padding: 1.5rem;
   text-align: justify;
   align-items: center;
+  color: var(--text-primary);
 }
 
 /* invisible stretched link over card */
-/* .card-link {
+.card-link {
   content: '';
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 1; 
+  z-index: 1;
   pointer-events: auto;
-} */
+}
 
-/* .card-link:hover {
+.card-link:hover {
   box-shadow: 4px 4px 6px var(--border-color);
-} */
+}
 
-/* .img-container {
+.img-container {
   width: 30%;
   height: auto;
   min-width: 250px;
@@ -186,7 +179,7 @@ footer p {
   height: 100%;
   object-fit: cover;
 }
-  */
+
 .navbar-brand {
   width: max-content;
   color: var(--text-primary);
@@ -205,32 +198,30 @@ footer p {
   justify-content: end;
 }
 
-/* .list-group {
+.list-group {
   border-top: 1px solid var(--border-color);
 }
 
 .list-group-item {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
   background-color: var(--bg-surface);
   color: var(--text-primary);
   padding-left: 0;
+  border: none;
 }
-
+/*
 .edit-btn {
   width: 20rem;
   margin: 4rem auto 1rem auto;
   font-size: 1.2rem;
 }
 
-.event-item-container {
-  display: flex;
-  flex-direction: row;
-  gap: 1rem;
-}
 
 .start-uppercase::first-letter {
   text-transform: capitalize;
 }
-
 
 
 #description-card {
