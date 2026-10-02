@@ -8,7 +8,8 @@ import express, {
   type NextFunction,
 } from 'express';
 import bodyParser from 'body-parser';
-import mysql from 'mysql2';
+import cors from 'cors';
+import mysql from 'mysql2/promise';
 import path from 'path';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -28,19 +29,11 @@ const app = express();
 const port = 3000;
 
 // DB connection
-const connection = mysql.createConnection({
+const connection = await mysql.createConnection({
   host: process.env.MYSQL_HOST || '',
   user: process.env.MYSQL_USER || '',
   password: process.env.MYSQL_PASSWORD || '',
   database: process.env.MYSQL_DB || '',
-});
-
-connection.connect((err) => {
-  if (err) {
-    console.log('Failed connect to the database!');
-  } else {
-    console.log('DB connection established!');
-  }
 });
 
 // app.use(
@@ -51,7 +44,7 @@ connection.connect((err) => {
 //     cookie: { secure: false }, // should be false for local environment as there is no https
 //   }),
 // );
-
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true })); //use bodyparser
 app.use(express.static(path.resolve() + '/public')); // set location of static files
 app.use('/attendee', attendeeRoutes);
@@ -149,5 +142,7 @@ app.use('/organiser', organiserRoutes);
 
 // Make the web application listen for HTTP requests
 app.listen(port, () => {
-  console.log(`Tecktalk server listening on http://localhost:${port}`);
+  console.log(`Techtalk server listening on http://localhost:${port}`);
 });
+
+export { connection };

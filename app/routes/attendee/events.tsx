@@ -1,5 +1,7 @@
 import type { Route } from './+types/events';
 import EventCard from '../components/eventCard';
+import { fetchEvents } from '~/utils/http';
+import { useState, useEffect } from 'react';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,6 +11,24 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Events() {
+  const [eventsData, setEventsData] = useState();
+  const [pending, setPending] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    //fetch future events
+    async function startFetching() {
+      try {
+        const fetchedData = await fetchEvents();
+        setEventsData(fetchedData);
+      } catch (err) {
+        setError(true);
+      }
+    }
+    startFetching();
+    setPending(false);
+  });
+
   return (
     <main>
       <h2>TechTalk: Tech Events UK</h2>
