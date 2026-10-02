@@ -27,7 +27,7 @@ export default function Events() {
     }
     startFetching();
     setPending(false);
-  });
+  }, []);
 
   return (
     <main>
