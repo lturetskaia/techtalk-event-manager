@@ -28,7 +28,6 @@ export default function Events() {
       try {
         const fetchedData = await fetchEvents();
         setEventsData(fetchedData);
-        console.log(fetchedData);
       } catch (err) {
         setIsError(true);
         altEventsText = 'No upcoming events have been found.';

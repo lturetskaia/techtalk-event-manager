@@ -18,6 +18,7 @@ export default [
   ...prefix('attendee', [
     layout('./routes/attendee/attendeeNav.tsx', [
       route('events', './routes/attendee/events.tsx'),
+      route('events/:eventId', './routes/attendee/event.tsx'),
       route('my-bookings', './routes/attendee/bookings.tsx'),
       route('profile', './routes/attendee/profile.tsx'),
     ]),

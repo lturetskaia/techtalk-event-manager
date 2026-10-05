@@ -211,6 +211,87 @@ footer p {
   padding-left: 0;
   border: none;
 }
+
+.event-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.event-details-content {
+  width: 90%;
+  padding-left: 1.5rem;
+  height: max-content;
+}
+
+.ticket-details {
+  display: block;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  text-align: justify;
+  padding: 10px, 10px;
+  align-items: center;
+  background-color: var(--accent-secondary);
+  color: var(--text-inverse);
+}
+
+.ticket-details p {
+  margin: 0.5rem 1rem;
+  font-weight: 500;
+}
+
+.table {
+  margin: 2rem 0;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  --bs-table-bg: var(--bg-surface);
+  --bs-table-color: var(--text-primary);
+  --bs-table-border: var(--border-color);
+}
+.table input {
+  width: 70px;
+}
+.col-50 {
+  width: 50%;
+}
+
+.col-20 {
+  width: 20%;
+}
+
+.col-15 {
+  width: 15%;
+}
+
+.total-price-container {
+  width: max-content;
+  min-width: 200px;
+  font-weight: 500;
+  margin-top: 0;
+}
+
+.total-price-container span {
+  padding: 0 10px;
+}
+
+.total-price-container p {
+  padding: 0;
+}
+
+.book-btn-container {
+  width: max-content;
+  margin-top: 0;
+}
+
+#book-form {
+  margin-bottom: 3rem;
+}
+
 /*
 .edit-btn {
   width: 20rem;
