@@ -11,13 +11,19 @@ interface EventData extends RowDataPacket {
   address: string;
 }
 
+interface OrganiserData extends RowDataPacket {
+  id: string;
+  name: string;
+  description: string;
+}
+
 const router = express.Router();
 
 router.get('/events', async (req, res, next) => {
   try {
     // Get data from "organiser" table
     const organiserQuery = 'SELECT * FROM organiser';
-    const [organiser] = await connection.query(organiserQuery);
+    const [organiser] = await connection.query<OrganiserData[]>(organiserQuery);
 
     console.log('Getting events from db');
 
@@ -30,7 +36,7 @@ router.get('/events', async (req, res, next) => {
       event.date = format(event.date, 'PPp'); // format date to Apr 29, 2027, 12:00 AM
     });
 
-    res.json({ events, organiser });
+    res.json({ events, organiser: organiser[0] });
   } catch (err) {
     next({
       status: 400,

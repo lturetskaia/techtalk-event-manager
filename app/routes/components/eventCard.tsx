@@ -7,6 +7,7 @@ interface EventCardProps {
   title: string;
   date: string;
   location: string;
+  imagePath: string;
 }
 
 export default function EventCard({
@@ -14,15 +15,18 @@ export default function EventCard({
   title,
   date,
   location,
+  imagePath,
 }: EventCardProps) {
   const eventPath = '/attendee/events/' + id;
+  const imageURL = '/' + imagePath;
+
   return (
     <Card className="card" id="event-card">
       <a href={eventPath} className="card-link"></a>
 
       <div className="img-container">
         <img
-          src=""
+          src={imageURL}
           className="card-img-top"
           alt="A photo of a technology event"
         />
