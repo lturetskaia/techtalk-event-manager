@@ -54,13 +54,7 @@ export default function Events() {
           {eventsData.events ? (
             eventsData.events.map((event) => (
               <div className="card-container" key={event.id}>
-                <EventCard
-                  id={event.id}
-                  title={event.title}
-                  date={event.date}
-                  location={event.address}
-                  imagePath={event.image_path}
-                ></EventCard>
+                <EventCard {...event} />
               </div>
             ))
           ) : (

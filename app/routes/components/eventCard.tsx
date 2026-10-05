@@ -1,24 +1,16 @@
 import Card from 'react-bootstrap/Card';
 import { ListGroup } from 'react-bootstrap';
-import { Link } from 'react-router';
-
-interface EventCardProps {
-  id: string;
-  title: string;
-  date: string;
-  location: string;
-  imagePath: string;
-}
+import type { EventData } from '~/utils/types';
 
 export default function EventCard({
   id,
   title,
   date,
-  location,
-  imagePath,
-}: EventCardProps) {
+  address,
+  image_path,
+}: EventData) {
   const eventPath = '/attendee/events/' + id;
-  const imageURL = '/' + imagePath;
+  const imageURL = '/' + image_path;
 
   return (
     <Card className="card" id="event-card">
@@ -44,7 +36,7 @@ export default function EventCard({
             <div>
               <b>Location:</b>
             </div>
-            <div>{location}</div>
+            <div>{address}</div>
           </ListGroup.Item>
         </ListGroup>
       </Card.Body>

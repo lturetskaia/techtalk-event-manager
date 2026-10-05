@@ -77,3 +77,13 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     </main>
   );
 }
+
+export function HydrateFallback() {
+  return (
+    <main>
+      <div className="card" id="description-card">
+        <p>Loading...</p>
+      </div>
+    </main>
+  );
+}

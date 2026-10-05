@@ -1,4 +1,4 @@
-import type { Route } from './+types/events';
+import type { Route } from './+types/event';
 import { useState, useEffect } from 'react';
 import EventDetails from './../components/eventDetails';
 import type { EventData, OrganiserData } from '../../utils/types';
@@ -11,49 +11,34 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export default function Events() {
-  const [eventsData, setEventData] = useState();
-  const [isPending, setIsPending] = useState(false);
-  const [isError, setIsError] = useState(false);
-  let eventAltMessage = 'Loading event details...';
+export async function clientLoader({ params }: Route.ClientLoaderArgs) {
+  const url = `http://localhost:3000/attendee/events/${params.eventId}`;
+  const response = await fetch(url);
 
-  useEffect(() => {
-    //fetch events
-    async function startFetching() {
-      try {
-        // const fetchedData = await fetchEvents();
-        // setEventData(fetchedData);
-        // console.log(fetchedData);
-      } catch (err) {
-        setIsError(true);
-        eventAltMessage = 'The requested event has not been found.';
-      }
-    }
-    startFetching();
-    setIsPending(false);
-  }, []);
+  if (!response.ok) {
+    throw Error('The page you are looking for does not exist.');
+  }
+
+  const eventData = await response.json();
+  return eventData;
+}
+
+export default function Event({ loaderData }: Route.ComponentProps) {
+  const [eventsData, setEventData] = useState(loaderData);
+  console.log(loaderData);
 
   return (
     <main>
-      {!isError || !isPending ? (
-        <>
-          <h2>Event Title</h2>
-          <EventDetails
-            date="10 Dec 2026"
-            description="Join top cloud architects for a deep dive into Kubernetes, serverless patterns, and mesh networks. Learn to scale microservices reliably without blowing your infrastructure budget."
-            location="New event location"
-            imagePath="default-img.png"
-          />
+      <h2>Event Title</h2>
+      <EventDetails event={eventsData.event} tickets={eventsData.tickets} />
 
-          <h2>Book tickets</h2>
+      <h2>Book tickets</h2>
 
-          <BookingForm />
-        </>
-      ) : (
-        <div className="card" id="description-card">
-          <p>{eventAltMessage}</p>
-        </div>
-      )}
+      <BookingForm
+        tickets={eventsData.tickets}
+        user={eventsData.user}
+        eventId={eventsData.event.id}
+      />
     </main>
   );
 }
