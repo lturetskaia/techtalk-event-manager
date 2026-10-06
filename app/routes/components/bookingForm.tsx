@@ -2,6 +2,7 @@ import { Button } from 'react-bootstrap';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
+import Alert from 'react-bootstrap/Alert';
 import { useState } from 'react';
 import type { TicketData, UserDetails, BookingData } from '~/utils/types';
 import { bookTickets } from '~/utils/http';
@@ -15,6 +16,12 @@ export default function BookingForm({
   eventId: string;
   user: UserDetails | undefined;
 }) {
+  const [bookingMessage, setBookingMessage] = useState({
+    active: false,
+    message: '',
+    isError: false,
+  });
+
   const [ticketsChosen, setTicketsChosen] = useState({
     standard: 0,
     concession: 0,
@@ -34,19 +41,49 @@ export default function BookingForm({
     ticketsChosen.standard * Number(standardPrice) +
     ticketsChosen.concession * concessionPrice;
 
-  function handleFormSubmission(formData: FormData) {
-    console.log('form triggered');
+  // async function handleFormSubmission(formData: FormData) {
+  async function handleFormSubmission(
+    event: React.SubmitEvent<HTMLFormElement>,
+  ) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const data = Object.fromEntries(formData.entries());
+
     const bookingData = {
-      first_name: formData.get('first_name')?.toString() || '',
-      last_name: formData.get('last_name')?.toString() || '',
-      email: formData.get('email')?.toString() || '',
-      phone: formData.get('phone')?.toString() || '',
-      standard: formData.get('standard')?.toString() || '0',
-      concession: formData.get('concession')?.toString() || '0',
+      first_name: data.first_name.toString() || '',
+      last_name: data.last_name.toString() || '',
+      email: data.email.toString() || '',
+      phone: data.phone.toString() || '',
+      standard: data.standard?.toString() || '0',
+      concession: data.concession?.toString() || '0',
     };
 
     console.log(bookingData);
-    bookTickets(eventId, bookingData);
+    try {
+      const response = await bookTickets(eventId, bookingData);
+      //show success message
+      setBookingMessage({
+        active: true,
+        message:
+          response.message || 'You have successfully booked the tickets!',
+        isError: false,
+      });
+    } catch (err: any) {
+      //show success message
+      setBookingMessage({
+        active: true,
+        message: err.message || 'Incorrect data or ticket amount!',
+        isError: true,
+      });
+    } finally {
+      setTimeout(() => {
+        setBookingMessage({
+          active: false,
+          message: '',
+          isError: false,
+        });
+      }, 5000);
+    }
   }
 
   function handleChangeTicketAmount(
@@ -69,7 +106,11 @@ export default function BookingForm({
     }
   }
   return (
-    <Form className="row g-3 card" id="book-form" action={handleFormSubmission}>
+    <Form
+      className="row g-3 card"
+      id="book-form"
+      onSubmit={handleFormSubmission}
+    >
       <Col className="col-md-6">
         <Form.Label htmlFor="first-name" className="form-label">
           First name
@@ -194,6 +235,11 @@ export default function BookingForm({
           </Button>
         </div>
       </div>
+      {bookingMessage.active ? (
+        <Alert variant={bookingMessage.isError ? 'danger' : 'success'}>
+          {bookingMessage.message}
+        </Alert>
+      ) : null}
     </Form>
   );
 }

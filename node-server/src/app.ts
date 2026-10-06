@@ -1,7 +1,5 @@
 // const { validateLogin } = require("./middlewares/dataValidator.js");
 // const { validationResult } = require("express-validator");
-// const { fetchFirstItem } = require("./utils/db-query.js");
-
 import express, {
   type Request,
   type Response,
@@ -45,7 +43,7 @@ const connection = await mysql.createConnection({
 //   }),
 // );
 app.use(cors());
-app.use(bodyParser.urlencoded({ extended: true })); //use bodyparser
+app.use(express.json()); //use bodyparser
 app.use(express.static(path.resolve() + '/public')); // set location of static files
 app.use('/attendee', attendeeRoutes);
 app.use('/organiser', organiserRoutes);
@@ -132,13 +130,13 @@ app.use('/organiser', organiserRoutes);
 //     message: 'The requested page was not found!',
 //   });
 // });
-// // Error handling middleware renders an error page
-// app.use((err, req, res, next) => {
-//   res.render('pages/common/error.ejs', {
-//     status: err.status || 500,
-//     message: err.message || 'Something went wrong!',
-//   });
-// });
+// Error handling middleware
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.log(err);
+  const errorMessage = err.message || 'Something went wrong';
+  const statusCode = err.status || 500;
+  res.status(statusCode).json({ message: errorMessage });
+});
 
 // Make the web application listen for HTTP requests
 app.listen(port, () => {

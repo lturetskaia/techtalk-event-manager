@@ -13,18 +13,23 @@ async function fetchEvents() {
 }
 
 async function bookTickets(id: string, bookingData: BookingData) {
-  const url = `http://localhost:3000/attendee/events/${id}`;
+  const url = `http://localhost:3000/attendee/events/${id}/book`;
   const response = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(bookingData),
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
   });
 
+  const responseData = await response.json();
+  console.log(responseData);
+
   if (!response.ok) {
-    throw Error();
+    throw Error(responseData.message);
   }
 
-  const eventsData = await response.json();
-  return eventsData;
+  return responseData;
 }
 
 export { fetchEvents, bookTickets };
