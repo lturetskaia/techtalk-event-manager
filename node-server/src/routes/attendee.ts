@@ -3,7 +3,7 @@ import express, {
   type Request,
   type Response,
 } from 'express';
-import type { RowDataPacket } from 'mysql2';
+import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 import { connection } from './../app.js';
 import { format } from 'date-fns';
 import {
@@ -13,7 +13,7 @@ import {
 import { validationResult } from 'express-validator';
 
 interface EventData extends RowDataPacket {
-  id: string;
+  id: number;
   title: string;
   image_path: string;
   date: string;
@@ -21,9 +21,18 @@ interface EventData extends RowDataPacket {
 }
 
 interface OrganiserData extends RowDataPacket {
-  id: string;
+  id: number;
   name: string;
   description: string;
+}
+
+interface TicketTypeData extends RowDataPacket {
+  id: number;
+  event_id: number;
+  type: string;
+  price: number;
+  quantity_left: number;
+  total_quantity: number;
 }
 
 const router = express.Router();
@@ -108,7 +117,6 @@ router.post(
   async (req: Request, res: Response, next: NextFunction) => {
     // Get errors from validation
     const errors = validationResult(req);
-    console.log(errors);
 
     if (!errors.isEmpty()) {
       // If there are any errors, pass the error to error handling middleware
@@ -122,101 +130,94 @@ router.post(
 
     const eventId = req.params.id;
     const bookingData = req.body;
-    let concessionTickets;
-    let standardTickets;
 
     try {
+      await connection.query('BEGIN');
+
       // Get standard tickets for the specific event from ticketType
       const standardTicketQuery =
         "SELECT * FROM ticketType WHERE event_id=? AND type='standard'";
-      standardTickets = await connection.query(standardTicketQuery, [eventId]);
+      const [standardTickets] = await connection.query<TicketTypeData[]>(
+        standardTicketQuery,
+        [eventId],
+      );
 
       // Get concession tickets for the specific event from ticketType
       const concessionTicketQuery =
         "SELECT * FROM ticketType WHERE event_id=? AND type='concession'";
-      concessionTickets = await connection.query(concessionTicketQuery, [
-        eventId,
-      ]);
-    } catch (err) {
-      const error = {
-        status: 500,
-        message: 'Failed to access ticket data. Please try again later.',
-      };
-      return next(error);
-    }
+      const [concessionTickets] = await connection.query<TicketTypeData[]>(
+        concessionTicketQuery,
+        [eventId],
+      );
 
-    console.log(standardTickets, concessionTickets);
+      if (standardTickets.length === 0 && concessionTickets.length === 0) {
+        // if no tickets have been found for both events show error
+        next({
+          status: 400,
+          message: 'No tickets have been found for this event.',
+        });
+        return;
+      }
 
-    if (!standardTickets && !concessionTickets) {
-      // if no tickets have been found for both events show error
-      next({
-        status: 400,
-        message:
-          'No tickets have been found for this event. Please try again later.',
-      });
-      return;
-    }
+      // Calculate new ticket quantity
+      const newStandardTicketQuantity =
+        (standardTickets[0]?.quantity_left || 0) - bookingData.standard;
+      const newConcessionTicketQuantity =
+        (concessionTickets[0]?.quantity_left || 0) - bookingData.concession;
 
-    const newStandardTicketQuantity =
-      standardTickets.quantity_left - bookingData.standard;
-    const newConcessionTicketQuantity =
-      concessionTickets.quantity_left - bookingData.concession;
-
-    // no tickets or user amount of tickets is more than the tickets left -> show an error
-    if (newStandardTicketQuantity < 0 || newConcessionTicketQuantity < 0) {
-      const err = {
-        status: 400,
-        message:
-          'Some of the tickets you are trying to order are not available. Please check the ticket information and try again.',
-      };
-      next(err);
-      return;
-    }
-
-    try {
-      // Begin transaction
-      await runQuery('BEGIN');
+      // If required ticket quantity is more than the tickets left, show an error
+      if (newStandardTicketQuantity < 0 || newConcessionTicketQuantity < 0) {
+        const err = {
+          status: 400,
+          message:
+            'Some of the tickets you are trying to order are not available. Please check the ticket information and try again.',
+        };
+        return next(err);
+      }
 
       // Adjust the quantity of tickets left in the database
       if (bookingData.standard > 0) {
         // Decrease the remaining quantity of the standard tickets for the event in ticketType
         const ticketChangeQuery =
           "UPDATE ticketType SET quantity_left=? WHERE event_id=? AND type='standard'";
-        await runQuery(ticketChangeQuery, [newStandardTicketQuantity, eventId]);
+        await connection.query(ticketChangeQuery, [
+          newStandardTicketQuantity,
+          eventId,
+        ]);
       }
 
       if (bookingData.concession > 0) {
         // Decrease the remaining quantity of the concession tickets for the event in ticketType
         const ticketChangeQuery =
           "UPDATE ticketType SET quantity_left=? WHERE event_id=? AND type='concession'";
-        await runQuery(ticketChangeQuery, [
+        await connection.query(ticketChangeQuery, [
           newConcessionTicketQuantity,
           eventId,
         ]);
       }
-      const orderNumber = uuidOrder();
+
       // Add a new user order to userOrders
       const newOrderQuery =
-        'INSERT INTO userOrder (order_number, first_name, last_name, email, phone) VALUES (?,?,?,?,?)';
-      await runQuery(newOrderQuery, [
-        orderNumber,
-        bookingData.firstName,
-        bookingData.lastName,
-        bookingData.email,
-        bookingData.phone,
-      ]);
+        'INSERT INTO userOrder (first_name, last_name, email, phone) VALUES (?,?,?,?)';
+      const [newOrderResult] = await connection.query<ResultSetHeader>(
+        newOrderQuery,
+        [
+          bookingData.first_name,
+          bookingData.last_name,
+          bookingData.email,
+          bookingData.phone,
+        ],
+      );
 
       // Add a ticket entry for every standard ticket bought
       if (bookingData.standard > 0) {
-        for (let i = 0; i < bookingrData.standard; i++) {
-          const tickeNumber = uuidTicket();
+        for (let i = 0; i < bookingData.standard; i++) {
           const newTicketQuery =
-            'INSERT INTO ticket (event_id, ticket_type, order_id, ticket_number) VALUES(?,?,(SELECT id FROM userOrder WHERE order_number=?), ?)';
-          await runQuery(newTicketQuery, [
+            'INSERT INTO ticket (event_id, ticket_type, order_id) VALUES(?,?,?)';
+          await connection.query(newTicketQuery, [
             eventId,
             'standard',
-            orderNumber,
-            tickeNumber,
+            newOrderResult.insertId,
           ]);
         }
       }
@@ -224,30 +225,30 @@ router.post(
       // Add a ticket entry for every concession ticket bought
       if (bookingData.concession > 0) {
         for (let i = 0; i < bookingData.concession; i++) {
-          const tickeNumber = uuidTicket();
           const newTicketQuery =
-            'INSERT INTO ticket (event_id, ticket_type, order_id, ticket_number) VALUES(?,?,(SELECT id FROM userOrder WHERE order_number=?), ?)';
-          await runQuery(newTicketQuery, [
+            'INSERT INTO ticket (event_id, ticket_type, order_id) VALUES(?,?,?)';
+          await connection.query(newTicketQuery, [
             eventId,
             'concession',
-            orderNumber,
-            tickeNumber,
+            newOrderResult.insertId,
           ]);
         }
       }
 
       // Commit transaction
-      await runQuery('COMMIT');
+      await connection.query('COMMIT');
     } catch (err) {
       // Roll back any changes made if there is an error
-      await runQuery('ROLLBACK');
+      await connection.query('ROLLBACK');
+      console.log(err);
       return next({
         status: 500,
-        message: 'Failed to save your booking data. Please try again later.',
+        message:
+          'Failed to book the tickets. Check ticket information or try again later.',
       });
     }
 
-    res.render('pages/attendee/booking-complete.ejs');
+    res.status(200).json({ message: 'Tickets booked successfully.' });
   },
 );
 
