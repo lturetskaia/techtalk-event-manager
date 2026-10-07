@@ -5,7 +5,8 @@ import express, {
   type Response,
   type NextFunction,
 } from 'express';
-import bodyParser from 'body-parser';
+import session from 'express-session';
+import MySQLSession from 'express-mysql-session';
 import cors from 'cors';
 import mysql from 'mysql2/promise';
 import path from 'path';
@@ -34,15 +35,47 @@ const connection = await mysql.createConnection({
   database: process.env.MYSQL_DB || '',
 });
 
-// app.use(
-//   session({
-//     secret: '',
-//     resave: false, //do not force resaving sessions
-//     saveUninitialized: true, // do not save uninitialise sessions
-//     cookie: { secure: false }, // should be false for local environment as there is no https
-//   }),
-// );
-app.use(cors());
+// Session setup
+
+declare module 'express-session' {
+  interface Session {
+    user?: {
+      id: number;
+      role: 'ATTENDEE' | 'ORGANISER';
+    };
+  }
+}
+const MySQLStore = MySQLSession(session);
+const sessionStore = new MySQLStore(
+  {
+    clearExpired: true,
+    checkExpirationInterval: 15 * 60 * 1000, // Clear expired sessions every 15 min (in ms)
+    expiration: 24 * 60 * 60 * 1000, // Valid for 24 hours (in ms)
+    createDatabaseTable: true,
+  },
+  connection as any,
+);
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET!,
+    store: sessionStore,
+    resave: false, //do not force resaving sessions
+    saveUninitialized: true, // do not save uninitialised sessions
+    cookie: {
+      secure: process.env.NODE_ENV === 'production', // should be false for local environment as there is no https
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: 'lax',
+    },
+  }),
+);
+
+app.use(
+  cors({
+    origin: 'http://localhost:5173', // Your React app URL (Do NOT use '*')
+    credentials: true, // Allows browser to exchange cookies cross-origin
+  }),
+);
 app.use(express.json()); //use bodyparser
 app.use(express.static(path.resolve() + '/public')); // set location of static files
 app.use('/attendee', attendeeRoutes);
