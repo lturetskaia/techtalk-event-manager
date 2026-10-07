@@ -49,7 +49,7 @@ export default function BookingForm({
     const formData = new FormData(event.currentTarget);
     const data = Object.fromEntries(formData.entries());
 
-    const bookingData = {
+    const bookingData: BookingData = {
       first_name: data.first_name.toString() || '',
       last_name: data.last_name.toString() || '',
       email: data.email.toString() || '',
@@ -58,7 +58,6 @@ export default function BookingForm({
       concession: data.concession?.toString() || '0',
     };
 
-    console.log(bookingData);
     try {
       const response = await bookTickets(eventId, bookingData);
       //show success message

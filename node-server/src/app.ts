@@ -1,5 +1,3 @@
-// const { validateLogin } = require("./middlewares/dataValidator.js");
-// const { validationResult } = require("express-validator");
 import express, {
   type Request,
   type Response,
@@ -8,7 +6,7 @@ import express, {
 import session from 'express-session';
 import MySQLSession from 'express-mysql-session';
 import cors from 'cors';
-import mysql from 'mysql2/promise';
+import mysql, { type RowDataPacket } from 'mysql2/promise';
 import path from 'path';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -16,35 +14,45 @@ dotenv.config();
 // Add all the route handlers in attendeeRoutes/organiserRoutes to the app under dedicated paths
 import attendeeRoutes from './routes/attendee.js';
 import organiserRoutes from './routes/organiser.js';
-
-// // Set up session config
-// import session from 'express-session';
+import { validateLogin } from './middleware/dataValidator.js';
+import { validationResult } from 'express-validator';
 
 //bcrypt for password hashing
-// import bcrypt from 'bcrypt';
-// const saltRounds = 10;
+import bcrypt from 'bcrypt';
+const saltRounds = 10;
+
+enum UserRoles {
+  ATTENDEE,
+  ORGANISER,
+}
+
+interface LoginData extends RowDataPacket {
+  id: number;
+  is_organiser: boolean;
+  password_hash: string;
+}
 
 const app = express();
 const port = 3000;
 
 // DB connection
-const connection = await mysql.createConnection({
+const connection = await mysql.createPool({
   host: process.env.MYSQL_HOST || '',
   user: process.env.MYSQL_USER || '',
   password: process.env.MYSQL_PASSWORD || '',
   database: process.env.MYSQL_DB || '',
 });
 
-// Session setup
-
 declare module 'express-session' {
   interface Session {
     user?: {
       id: number;
-      role: 'ATTENDEE' | 'ORGANISER';
+      role: UserRoles;
     };
   }
 }
+
+// Session setup
 const MySQLStore = MySQLSession(session);
 const sessionStore = new MySQLStore(
   {
@@ -96,73 +104,79 @@ app.use('/organiser', organiserRoutes);
 //   res.redirect('/'); //redirect to root
 // });
 
-// // POST: login requests for all users
-// app.post('/login', validateLogin, async (req, res, next) => {
-//   const errors = validationResult(req);
-//   const userData = req.body;
+// POST: login requests for all users
+app.post(
+  '/login',
+  validateLogin,
+  async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    const userData = req.body;
 
-//   //validate login data
-//   if (!errors.isEmpty()) {
-//     // If there are any errors, pass the error to error handling middleware
-//     return next({
-//       status: 400,
-//       message: 'Bad input! Please check your login information and try again.',
-//     });
-//   }
+    //validate login data
+    if (!errors.isEmpty()) {
+      // If there are any errors, pass the error to error handling middleware
+      return next({
+        status: 400,
+        message:
+          'Bad input! Please check your login information and try again.',
+      });
+    }
 
-//   // Retrieve user data from the db
-//   try {
-//     // SELECTS user password hash and admin status that matches the provided email from user table
-//     const userQuery =
-//       'SELECT user.id, user.password_hash, user.is_admin FROM user WHERE user.email=?';
-//     const storedUserData = await fetchFirstItem(userQuery, [userData.email]);
-//     if (!storedUserData) {
-//       return next({
-//         status: 500,
-//         message:
-//           'The user with these credentials has not been found! Check your email and password and try again.',
-//       });
-//     }
+    // Retrieve user data from the db
+    try {
+      // Selects user password hash and admin status that matches the provided email from user table
+      const userQuery =
+        'SELECT user.id, user.password_hash, user.is_organiser FROM user WHERE user.email=?';
+      const [storedUserData] = await connection.query<LoginData[]>(userQuery, [
+        userData.email,
+      ]);
+      if (!storedUserData || storedUserData.length === 0) {
+        return next({
+          status: 500,
+          message:
+            'The user with these credentials has not been found! Check your email and password and try again.',
+        });
+      }
 
-//     bcrypt.compare(
-//       userData.password,
-//       storedUserData.password_hash,
-//       function (err, result) {
-//         if (err) {
-//           throw Error();
-//         }
+      bcrypt.compare(
+        userData.password,
+        storedUserData[0]!.password_hash,
+        function (err, result) {
+          if (err) {
+            throw Error();
+          }
 
-//         if (result) {
-//           req.session.user = { id: storedUserData.id };
-//           //Redirect to a dedicated page
-//           if (storedUserData.is_admin) {
-//             req.session.user.role = 'admin';
-//             res.redirect('/organiser/dashboard');
-//           } else {
-//             req.session.user.role = 'attendee';
-//             res.redirect('/attendee');
-//           }
-//         } else {
-//           //return error page
-//           return next({
-//             status: 500,
-//             message:
-//               'The user with these credentials has not been found! Check your email and password and try again.',
-//           });
-//         }
-//       },
-//     );
-//   } catch (err) {
-//     return next({ status: 500, message: 'Internal server error.' });
-//   }
-// });
+          if (result) {
+            const userPayload = {
+              id: storedUserData[0]!.id,
+              role: storedUserData[0]!.is_organiser
+                ? UserRoles.ORGANISER
+                : UserRoles.ATTENDEE,
+            };
 
-// app.get('*', function (req, res) {
-//   res.render('pages/common/error.ejs', {
-//     status: 404,
-//     message: 'The requested page was not found!',
-//   });
-// });
+            req.session.user = userPayload;
+
+            // 3. Return user data including role
+            res.json({
+              message: 'Login successful',
+              user: userPayload,
+            });
+          } else {
+            //return error page
+            return next({
+              status: 500,
+              message:
+                'The user with these credentials has not been found! Check your email and password and try again.',
+            });
+          }
+        },
+      );
+    } catch (err) {
+      return next({ status: 500, message: 'Internal server error.' });
+    }
+  },
+);
+
 // Error handling middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.log(err);
