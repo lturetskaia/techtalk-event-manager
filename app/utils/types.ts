@@ -53,5 +53,5 @@ export interface AuthContextType {
   user: UserLoginData | null;
   isLoading: boolean;
   login: (loginData: LoginData) => Promise<UserLoginData>;
-  logout: () => void;
+  logout: () => Promise<boolean>;
 }

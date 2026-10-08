@@ -40,7 +40,10 @@ async function get(path: string) {
   return responseData;
 }
 
-async function post(path: string, data: LoginData | BookingData | null = null) {
+async function post(
+  path: string,
+  data: LoginData | BookingData | undefined = undefined,
+) {
   const url = `http://localhost:3000${path}`;
   const response = await fetch(url, {
     method: 'POST',

@@ -89,20 +89,20 @@ app.use(express.static(path.resolve() + '/public')); // set location of static f
 app.use('/attendee', attendeeRoutes);
 app.use('/organiser', organiserRoutes);
 
-// app.get('/logout', (req, res, next) => {
-//   if (req.session) {
-//     // Destroy the session
-//     req.session.destroy((err) => {
-//       if (err) {
-//         return next({
-//           status: 500,
-//           message: 'Could not log out. Please try again.',
-//         });
-//       }
-//     });
-//   }
-//   res.redirect('/'); //redirect to root
-// });
+app.post('/logout', (req, res, next) => {
+  if (req.session) {
+    // Destroy the session
+    req.session.destroy((err) => {
+      if (err) {
+        return next({
+          status: 500,
+          message: 'Could not log out. Please try again.',
+        });
+      }
+    });
+  }
+  res.status(200).json({ message: 'Logout successful' }); //redirect to root
+});
 
 // Returns logged-in user profile if session exists
 app.get('/api/me', (req: Request, res: Response) => {
@@ -146,16 +146,22 @@ app.post(
         });
       }
 
+      //compare passwords
       bcrypt.compare(
         userData.password,
         storedUserData[0]!.password_hash,
         function (err, result) {
-          console.log(userData.password, storedUserData[0]!.password_hash);
           if (err) {
             throw Error();
           }
 
           if (result) {
+            req.session.regenerate((err) => {
+              if (err) {
+                return res.status(500).json({ message: 'Session error' });
+              }
+            });
+
             const userPayload = {
               id: storedUserData[0]!.id,
               role: storedUserData[0]!.is_organiser
@@ -165,7 +171,14 @@ app.post(
 
             req.session.user = userPayload;
 
-            // 3. Return user data including role
+            console.log(
+              'Login successful, user role: ' +
+                userPayload.id +
+                ' ' +
+                userPayload.role,
+            );
+
+            // Return user data including role
             res.json({
               message: 'Login successful',
               user: userPayload,
