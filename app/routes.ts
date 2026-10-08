@@ -8,14 +8,15 @@ import {
 
 export default [
   index('routes/main.tsx'),
-
   ...prefix('organiser', [
+    route('login', './routes/organiser/login.tsx'),
     layout('./routes/organiser/organiserMenu.tsx', [
       route('dashboard', './routes/organiser/dashboard.tsx'),
       route('settings', './routes/organiser/settings.tsx'),
     ]),
   ]),
   ...prefix('attendee', [
+    route('login', './routes/attendee/login.tsx'),
     layout('./routes/attendee/attendeeNav.tsx', [
       route('events', './routes/attendee/events.tsx'),
       route('events/:eventId', './routes/attendee/event.tsx'),

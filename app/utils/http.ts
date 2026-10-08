@@ -1,4 +1,4 @@
-import type { BookingData } from './types';
+import type { BookingData, LoginData } from './types';
 
 async function fetchEvents() {
   const url = 'http://localhost:3000/attendee/events';
@@ -32,4 +32,24 @@ async function bookTickets(id: string, bookingData: BookingData) {
   return responseData;
 }
 
-export { fetchEvents, bookTickets };
+async function logIn(loginData: LoginData) {
+  const url = `http://localhost:3000/login`;
+  const response = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(loginData),
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  });
+
+  const responseData = await response.json();
+  console.log(responseData);
+
+  if (!response.ok) {
+    throw Error(responseData.message);
+  }
+
+  return responseData;
+}
+
+export { fetchEvents, bookTickets, logIn };

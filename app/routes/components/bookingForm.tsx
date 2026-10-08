@@ -41,7 +41,6 @@ export default function BookingForm({
     ticketsChosen.standard * Number(standardPrice) +
     ticketsChosen.concession * concessionPrice;
 
-  // async function handleFormSubmission(formData: FormData) {
   async function handleFormSubmission(
     event: React.SubmitEvent<HTMLFormElement>,
   ) {

@@ -292,6 +292,28 @@ footer p {
   margin-bottom: 3rem;
 }
 
+.login {
+  width: 80%;
+  max-width: 400px;
+  justify-self: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+  margin-top: 2.3rem;
+}
+
+.login button {
+  margin-top: 2rem;
+  width: 10rem;
+  align-self: center;
+}
+
+#auth-option-info {
+  margin: 0.5rem 0;
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
 /*
 .edit-btn {
   width: 20rem;

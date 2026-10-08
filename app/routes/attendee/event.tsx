@@ -29,7 +29,7 @@ export default function Event({ loaderData }: Route.ComponentProps) {
 
   return (
     <main>
-      <h2>Event Title</h2>
+      <h2>{eventsData.event.title}</h2>
       <EventDetails event={eventsData.event} tickets={eventsData.tickets} />
 
       <h2>Book tickets</h2>
