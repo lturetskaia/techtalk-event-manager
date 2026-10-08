@@ -1,19 +1,15 @@
-import type { NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 
 const requireAuth = (req: Request, res: Response, next: NextFunction) => {
   if (req.session.user && req.session.user.id) {
     return next(); // User is authenticated, continue to next middleware
   } else {
-    if (req.baseUrl === '/attendee') {
-      res.redirect('/attendee/login'); // User is not authenticated, redirect to login page
-    } else {
-      res.redirect('/organiser/login'); // User is not authenticated, redirect to login page
-    }
+    res.status(401).json({ message: 'User not autenticated.' });
   }
 };
 
 // Create role-based access control middleware
-const verifyRole = (role) => {
+const verifyRole = (role: 'ATTENDEE' | 'ORGANISER') => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.session.user || req.session.user.role !== role) {
       // User role doesn't match
