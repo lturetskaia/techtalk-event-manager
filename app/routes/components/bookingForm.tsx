@@ -5,7 +5,7 @@ import Table from 'react-bootstrap/Table';
 import Alert from 'react-bootstrap/Alert';
 import { useState } from 'react';
 import type { TicketData, UserDetails, BookingData } from '~/utils/types';
-import { bookTickets } from '~/utils/http';
+import { post } from '~/utils/http';
 
 export default function BookingForm({
   tickets,
@@ -58,7 +58,10 @@ export default function BookingForm({
     };
 
     try {
-      const response = await bookTickets(eventId, bookingData);
+      const response = await post(
+        `/attendee/events/${eventId}/book`,
+        bookingData,
+      );
       //show success message
       setBookingMessage({
         active: true,
@@ -66,6 +69,7 @@ export default function BookingForm({
           response.message || 'You have successfully booked the tickets!',
         isError: false,
       });
+      event.target.reset();
     } catch (err: any) {
       //show success message
       setBookingMessage({

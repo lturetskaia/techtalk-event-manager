@@ -6,7 +6,7 @@ import {
   useContext,
   type ReactNode,
 } from 'react';
-import { get, post, logIn } from './http';
+import { get, post } from './http';
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (loginData: LoginData) => {
-    const res = await logIn(loginData);
+    const res = await post('/login', loginData);
     setUser(res.user);
     return res.user; //return the new user login data
   };
