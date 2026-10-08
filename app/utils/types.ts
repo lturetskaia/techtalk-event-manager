@@ -43,3 +43,15 @@ export interface LoginData {
   email: string;
   password: string;
 }
+
+export interface UserLoginData {
+  id: number;
+  role: 'ATTENDEE' | 'ORGANISER';
+}
+
+export interface AuthContextType {
+  user: UserLoginData | null;
+  isLoading: boolean;
+  login: (loginData: LoginData) => Promise<UserLoginData>;
+  logout: () => void;
+}

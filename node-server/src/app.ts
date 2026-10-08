@@ -22,14 +22,14 @@ import bcrypt from 'bcrypt';
 const saltRounds = 10;
 
 enum UserRoles {
-  ATTENDEE,
-  ORGANISER,
+  ATTENDEE = 'ATTENDEE',
+  ORGANISER = 'ORGANISER',
 }
 
 interface LoginData extends RowDataPacket {
   id: number;
   is_organiser: boolean;
-  password_hash: string;
+  password_hash: UserRoles;
 }
 
 const app = express();
@@ -47,7 +47,7 @@ declare module 'express-session' {
   interface Session {
     user?: {
       id: number;
-      role: UserRoles;
+      role: string;
     };
   }
 }
@@ -104,6 +104,14 @@ app.use('/organiser', organiserRoutes);
 //   res.redirect('/'); //redirect to root
 // });
 
+// Returns logged-in user profile if session exists
+app.get('/api/me', (req: Request, res: Response) => {
+  if (!req.session.user) {
+    return res.status(401).json({ message: 'Not authenticated' });
+  }
+  res.json({ user: req.session.user });
+});
+
 // POST: login requests for all users
 app.post(
   '/login',
@@ -142,6 +150,7 @@ app.post(
         userData.password,
         storedUserData[0]!.password_hash,
         function (err, result) {
+          console.log(userData.password, storedUserData[0]!.password_hash);
           if (err) {
             throw Error();
           }

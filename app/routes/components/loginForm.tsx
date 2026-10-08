@@ -1,8 +1,20 @@
 import { Form, Button } from 'react-bootstrap';
 import type { LoginData } from '~/utils/types';
-import { logIn } from '~/utils/http';
+import { Alert } from 'react-bootstrap';
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
+import { useAuth } from '~/utils/AuthContext';
 
 export default function LoginForm() {
+  const [loginError, setLoginError] = useState({
+    isError: false,
+    message: '',
+  });
+
+  const { user, login } = useAuth();
+
+  const navigate = useNavigate();
+
   async function handleFormSubmission(
     event: React.SubmitEvent<HTMLFormElement>,
   ) {
@@ -16,11 +28,20 @@ export default function LoginForm() {
     };
 
     try {
-      const response = await logIn(loginData);
-      console.log('Successful login: ', response);
+      const loggedInUser = await login(loginData);
+      console.log(loggedInUser);
+      //redirect to /organiser/dashboard or attendee/my-bookings
+      if (loggedInUser.role === 'ORGANISER') {
+        navigate('/organiser/dashboard');
+      } else if (loggedInUser.role === 'ATTENDEE') {
+        navigate('/attendee/events');
+      }
     } catch (err: any) {
       //show error message
-      console.log('Failed login: ', err);
+      setLoginError({
+        isError: true,
+        message: 'The user with these credentials has not been found!',
+      });
     }
   }
   return (
@@ -38,6 +59,9 @@ export default function LoginForm() {
         <Form.Label htmlFor="password">Password</Form.Label>
         <Form.Control type="password" id="password" name="password" />
       </div>
+      {loginError.isError ? (
+        <Alert variant={'danger'}>{loginError.message}</Alert>
+      ) : null}
       <div>
         <Button type="submit" className="btn btn-primary">
           Submit

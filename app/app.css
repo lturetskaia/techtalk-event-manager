@@ -314,6 +314,10 @@ footer p {
   color: var(--text-secondary);
   text-decoration: none;
 }
+
+.alert-danger {
+  font-size: 1rem;
+}
 /*
 .edit-btn {
   width: 20rem;
