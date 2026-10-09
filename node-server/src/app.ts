@@ -69,7 +69,7 @@ app.use(
     secret: process.env.SESSION_SECRET!,
     store: sessionStore,
     resave: false, //do not force resaving sessions
-    saveUninitialized: true, // do not save uninitialised sessions
+    saveUninitialized: false, // do not save uninitialised sessions
     cookie: {
       secure: process.env.NODE_ENV === 'production', // should be false for local environment as there is no https
       maxAge: 24 * 60 * 60 * 1000,
@@ -109,6 +109,7 @@ app.get('/api/me', (req: Request, res: Response) => {
   if (!req.session.user) {
     return res.status(401).json({ message: 'Not authenticated' });
   }
+  console.log(req.session);
   res.json({ user: req.session.user });
 });
 
@@ -140,59 +141,102 @@ app.post(
       ]);
       if (!storedUserData || storedUserData.length === 0) {
         return next({
-          status: 500,
+          status: 401,
           message:
             'The user with these credentials has not been found! Check your email and password and try again.',
         });
       }
 
-      //compare passwords
-      bcrypt.compare(
+      const userRecord = storedUserData[0]!;
+
+      const isPasswordMatch = await bcrypt.compare(
         userData.password,
-        storedUserData[0]!.password_hash,
-        function (err, result) {
-          if (err) {
-            throw Error();
-          }
-
-          if (result) {
-            req.session.regenerate((err) => {
-              if (err) {
-                return res.status(500).json({ message: 'Session error' });
-              }
-            });
-
-            const userPayload = {
-              id: storedUserData[0]!.id,
-              role: storedUserData[0]!.is_organiser
-                ? UserRoles.ORGANISER
-                : UserRoles.ATTENDEE,
-            };
-
-            req.session.user = userPayload;
-
-            console.log(
-              'Login successful, user role: ' +
-                userPayload.id +
-                ' ' +
-                userPayload.role,
-            );
-
-            // Return user data including role
-            res.json({
-              message: 'Login successful',
-              user: userPayload,
-            });
-          } else {
-            //return error page
-            return next({
-              status: 500,
-              message:
-                'The user with these credentials has not been found! Check your email and password and try again.',
-            });
-          }
-        },
+        userRecord.password_hash,
       );
+
+      if (!isPasswordMatch) {
+        return next({
+          status: 401,
+          message:
+            'The user with these credentials has not been found! Check your email and password and try again.',
+        });
+      }
+
+      const userPayload = {
+        id: userRecord.id,
+        role: userRecord.is_organiser
+          ? UserRoles.ORGANISER
+          : UserRoles.ATTENDEE,
+      };
+
+      req.session.user = userPayload;
+
+      console.log(
+        `Login successful, user ID: ${req.session.user.id}, role: ${req.session.user.role}`,
+      );
+
+      return res.json({
+        message: 'Login successful',
+        user: userPayload,
+      });
+
+      // //compare passwords
+      // bcrypt.compare(
+      //   userData.password,
+      //   storedUserData[0]!.password_hash,
+      //   function (err, result) {
+      //     if (err) {
+      //       throw Error();
+      //     }
+
+      //     if (result) {
+      //       // req.session.regenerate((err) => {
+      //       //   if (err) {
+      //       //     return res.status(500).json({ message: 'Session error' });
+      //       //   }
+      //       // });
+
+      //       const userPayload = {
+      //         id: storedUserData[0]!.id,
+      //         role: storedUserData[0]!.is_organiser
+      //           ? UserRoles.ORGANISER
+      //           : UserRoles.ATTENDEE,
+      //       };
+
+      //       req.session.user = userPayload;
+
+      //       req.session.save((saveErr) => {
+      //         if (saveErr) {
+      //           return res
+      //             .status(500)
+      //             .json({ message: 'Failed to persist session' });
+      //         }
+      //         res.json({
+      //           message: 'Login successful',
+      //           user: userPayload,
+      //         });
+      //       });
+
+      //       console.log(
+      //         'Login successful, user role: ' +
+      //           userPayload.id +
+      //           ' ' +
+      //           userPayload.role,
+      //       );
+      //       // res.json({
+      //       //   message: 'Login successful',
+      //       //   user: userPayload,
+      //       // });
+      //     } else {
+      //       //return error page
+      //       return next({
+      //         status: 500,
+      //         message:
+      //           'The user with these credentials has not been found! Check your email and password and try again.',
+      //       });
+      //     }
+      //   },
+      // );
     } catch (err) {
       return next({ status: 500, message: 'Internal server error.' });
     }

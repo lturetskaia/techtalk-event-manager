@@ -35,9 +35,20 @@ interface TicketTypeData extends RowDataPacket {
   total_quantity: number;
 }
 
+interface UserDetails extends RowDataPacket {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  is_organiser: boolean;
+}
+
 const router = express.Router();
 
 router.get('/events', async (req, res, next) => {
+  console.log('Events route');
+  console.log(req.session);
   try {
     // Get data from "organiser" table
     const organiserQuery = 'SELECT * FROM organiser';
@@ -62,52 +73,54 @@ router.get('/events', async (req, res, next) => {
 });
 
 // SINGLE EVENT PAGE (ATTENDEE EVENT)
-router.get('/events/:id', async (req, res, next) => {
-  const eventId = req.params.id;
-  let user = {};
-  // if (req.session.user) {
-  //   //if the user is logged in
-  //   const userId = req.session.user.id;
-  //   //Get logged in user details
-  //   const userQuery = "SELECT * FROM user WHERE id=?";
-  //   user = await fetchFirstItem(userQuery, [userId]);
-  // }
-
-  try {
-    //Get joint event and location data for a specific event id
-    const eventsQuery =
-      "SELECT event.id, event.title, event.image_path, event.date, event.description, CONCAT_WS(',', location.building_name, CONCAT_WS(' ', location.building_number, location.street), location.city,location.country, location.postcode) AS address FROM event JOIN location ON event.location_id=location.id WHERE is_published=true AND event.id=? ";
-    const [events] = await connection.query<EventData[]>(eventsQuery, [
-      eventId,
-    ]);
-
-    let event;
-    if (events.length == 1) {
-      event = events[0];
-      event!.date = format(event!.date, 'PPp'); // format date to Apr 29, 2027, 12:00 AM
-    } else {
-      throw Error('Wrong number of events');
+router.get(
+  '/events/:id',
+  async (req: Request, res: Response, next: NextFunction) => {
+    const eventId = req.params.id;
+    console.log('One event route');
+    console.log(req.session);
+    let user: UserDetails | undefined;
+    if (req.session.user && req.session.user.role === 'ATTENDEE') {
+      //if the user is logged in
+      const userId = req.session.user.id;
+      //Get logged in user details
+      const userQuery = 'SELECT * FROM user WHERE id=?';
+      const [userData] = await connection.query<UserDetails[]>(userQuery, [
+        userId,
+      ]);
+      user = userData[0];
     }
+    console.log(user);
 
-    // Get tickets for the specific event from ticketType
-    const ticketQuery = 'SELECT * FROM ticketType WHERE event_id=?';
-    const [tickets] = await connection.query(ticketQuery, [eventId]);
+    try {
+      //Get joint event and location data for a specific event id
+      const eventsQuery =
+        "SELECT event.id, event.title, event.image_path, event.date, event.description, CONCAT_WS(',', location.building_name, CONCAT_WS(' ', location.building_number, location.street), location.city,location.country, location.postcode) AS address FROM event JOIN location ON event.location_id=location.id WHERE is_published=true AND event.id=? ";
+      const [events] = await connection.query<EventData[]>(eventsQuery, [
+        eventId,
+      ]);
 
-    res.json({ event, tickets, user });
-    // res.render('pages/attendee/attendee-event.ejs', {
-    //   user,
-    //   event,
-    //   tickets,
-    //   attendeeLoggedIn: attendeeLoggedIn(req.session),
-    //   pageId: 'attendee-event',
-    // });
-  } catch (err) {
-    next({
-      status: 500,
-      message: 'Internal server error',
-    });
-  }
-});
+      let event;
+      if (events.length == 1) {
+        event = events[0];
+        event!.date = format(event!.date, 'PPp'); // format date to Apr 29, 2027, 12:00 AM
+      } else {
+        throw Error('Wrong number of events');
+      }
+
+      // Get tickets for the specific event from ticketType
+      const ticketQuery = 'SELECT * FROM ticketType WHERE event_id=?';
+      const [tickets] = await connection.query(ticketQuery, [eventId]);
+
+      res.json({ event, tickets, user });
+    } catch (err) {
+      next({
+        status: 500,
+        message: 'Internal server error',
+      });
+    }
+  },
+);
 
 // POST: PROCESSING EVENT BOOKING DATA
 router.post(

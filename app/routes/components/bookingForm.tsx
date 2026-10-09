@@ -123,7 +123,7 @@ export default function BookingForm({
           name="first_name"
           min="1"
           max="50"
-          value={user ? user.first_name : ''}
+          defaultValue={user ? user.first_name : ''}
           required
         />
       </Col>
@@ -137,7 +137,7 @@ export default function BookingForm({
           name="last_name"
           min="1"
           max="50"
-          value={user ? user.last_name : ''}
+          defaultValue={user ? user.last_name : ''}
           required
         />
       </Col>
@@ -151,7 +151,7 @@ export default function BookingForm({
           name="email"
           placeholder="example@example.com"
           max="254"
-          value={user ? user.email : ''}
+          defaultValue={user ? user.email : ''}
           required
         />
       </Col>
@@ -166,7 +166,7 @@ export default function BookingForm({
           placeholder="123-456-7890"
           min="4"
           max="50"
-          value={user ? user.phone : ''}
+          defaultValue={user ? user.phone : ''}
           required
         />
       </Col>

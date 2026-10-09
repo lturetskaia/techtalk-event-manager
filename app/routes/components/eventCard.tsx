@@ -1,6 +1,7 @@
 import Card from 'react-bootstrap/Card';
 import { ListGroup } from 'react-bootstrap';
 import type { EventData } from '~/utils/types';
+import { Link } from 'react-router';
 
 export default function EventCard({
   id,
@@ -14,7 +15,7 @@ export default function EventCard({
 
   return (
     <Card className="card" id="event-card">
-      <a href={eventPath} className="card-link"></a>
+      <Link to={eventPath} className="card-link"></Link>
 
       <div className="img-container">
         <img
