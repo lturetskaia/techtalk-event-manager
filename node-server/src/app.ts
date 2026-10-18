@@ -109,7 +109,7 @@ app.get('/api/me', (req: Request, res: Response) => {
   if (!req.session.user) {
     return res.status(401).json({ message: 'Not authenticated' });
   }
-  console.log(req.session);
+
   res.json({ user: req.session.user });
 });
 
@@ -171,9 +171,9 @@ app.post(
 
       req.session.user = userPayload;
 
-      console.log(
-        `Login successful, user ID: ${req.session.user.id}, role: ${req.session.user.role}`,
-      );
+      // console.log(
+      //   `Login successful, user ID: ${req.session.user.id}, role: ${req.session.user.role}`,
+      // );
 
       return res.json({
         message: 'Login successful',

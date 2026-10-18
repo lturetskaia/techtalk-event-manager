@@ -11,6 +11,7 @@ import {
   validateUser,
 } from './../middleware/dataValidator.js';
 import { validationResult } from 'express-validator';
+import { requireAuth, verifyRole } from '../middleware/auth.js';
 
 interface EventData extends RowDataPacket {
   id: number;
@@ -44,11 +45,18 @@ interface UserDetails extends RowDataPacket {
   is_organiser: boolean;
 }
 
+interface UserTicketData extends RowDataPacket {
+  id: number;
+  event_id: number;
+  ticket_type: string;
+  order_id: number;
+  title: string;
+  date: string;
+  address: string;
+}
 const router = express.Router();
 
 router.get('/events', async (req, res, next) => {
-  console.log('Events route');
-  console.log(req.session);
   try {
     // Get data from "organiser" table
     const organiserQuery = 'SELECT * FROM organiser';
@@ -77,8 +85,6 @@ router.get(
   '/events/:id',
   async (req: Request, res: Response, next: NextFunction) => {
     const eventId = req.params.id;
-    console.log('One event route');
-    console.log(req.session);
     let user: UserDetails | undefined;
     if (req.session.user && req.session.user.role === 'ATTENDEE') {
       //if the user is logged in
@@ -90,7 +96,6 @@ router.get(
       ]);
       user = userData[0];
     }
-    console.log(user);
 
     try {
       //Get joint event and location data for a specific event id
@@ -263,6 +268,44 @@ router.post(
 
     res.status(200).json({ message: 'Tickets booked successfully.' });
   },
+);
+
+router.get(
+  '/my-bookings',
+  requireAuth,
+  verifyRole('ATTENDEE'),
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.session.user!.id;
+    try {
+      const userTicketsQuery =
+        "SELECT ticket.*, event.title, event.date, CONCAT_WS(',', location.building_name, CONCAT_WS(' ', location.building_number, location.street), location.city,location.country, location.postcode) AS address from ticket JOIN event ON ticket.event_id=event.id JOIN location ON location.id=event.location_id WHERE order_id IN (SELECT id FROM userOrder WHERE email IN (SELECT email FROM user WHERE id=?))";
+
+      const [userTicketsData] = await connection.query<UserTicketData[]>(
+        userTicketsQuery,
+        [userId],
+      );
+      console.log(userTicketsData);
+
+      // format date to Apr 29, 2027, 12:00 AM
+      userTicketsData.forEach((ticket) => {
+        ticket.date = format(ticket.date, 'PPp');
+      });
+
+      res.json({ userTicketsData });
+    } catch (err) {
+      next({
+        status: 500,
+        message: 'No tickets have been found',
+      });
+    }
+  },
+);
+
+router.get(
+  '/profile',
+  requireAuth,
+  verifyRole('ATTENDEE'),
+  (req: Request, res: Response, next: NextFunction) => {},
 );
 
 export default router;

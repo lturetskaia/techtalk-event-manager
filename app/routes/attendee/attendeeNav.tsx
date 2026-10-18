@@ -2,7 +2,7 @@ import { Outlet } from 'react-router';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import { Link, useNavigate, NavLink } from 'react-router';
+import { useNavigate, NavLink } from 'react-router';
 import { useAuth } from '~/utils/AuthContext';
 
 export default function AttendeeMenu() {
@@ -38,7 +38,7 @@ export default function AttendeeMenu() {
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="navbarNavAltMarkup">
-            <Nav variant="underline" defaultActiveKey="events">
+            <Nav variant="underline">
               <Nav.Link as={NavLink} to="/attendee/events" eventKey="events">
                 Events
               </Nav.Link>

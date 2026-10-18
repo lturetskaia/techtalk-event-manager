@@ -1,4 +1,9 @@
 import type { Route } from './+types/bookings';
+import { useState } from 'react';
+import { get } from './../../utils/http';
+import type { UserTicketData } from './../../utils/types';
+import { NavLink } from 'react-router';
+import TicketCard from '../components/ticketCard';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -7,10 +12,29 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export default function Bookings() {
+export async function clientLoader() {
+  const bookingData = await get('/attendee/my-bookings');
+  return bookingData.userTicketsData;
+}
+
+export default function Bookings({ loaderData }: Route.ComponentProps) {
+  const [bookingData, setBookingData] = useState<UserTicketData[]>(loaderData);
+
   return (
-    <>
-      <h1>My Bookings Page</h1>
-    </>
+    <main>
+      <h2>My Bookings Page</h2>
+      <div className="card-container">
+        {bookingData.length > 0 ? (
+          bookingData.map((ticket) => (
+            <TicketCard key={ticket.id} ticket={ticket} />
+          ))
+        ) : (
+          <p>
+            No tickets have been found. Register for our{' '}
+            <NavLink to="/attendee/events">upcoming events</NavLink>.
+          </p>
+        )}
+      </div>
+    </main>
   );
 }
