@@ -1,4 +1,5 @@
 import type { TicketTypeData, EventData } from '../utils/types.js';
+import { format } from 'date-fns';
 
 // Merges organiser event and tickets data into an object
 export const formatOrganiserEventData = (
@@ -23,6 +24,13 @@ export const formatOrganiserEventData = (
     }
     if (concessionTickets) {
       event.concessionTickets = concessionTickets;
+    }
+
+    event.modified_date = format(new Date(event.modified_date), 'PPp');
+    event.create_date = format(new Date(event.create_date), 'PPp');
+    event.date = format(new Date(event.date), 'PPp');
+    if (event.publish_date) {
+      event.publish_date = format(new Date(event.publish_date), 'PPp');
     }
   });
 
