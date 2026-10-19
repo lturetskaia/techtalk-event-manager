@@ -15,7 +15,6 @@ export function meta({}: Route.MetaArgs) {
 
 export async function clientLoader() {
   const data = await get('/organiser/dashboard');
-  console.log(data);
   return data;
 }
 
@@ -33,7 +32,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
         + Create new event
       </NavLink>
       <h2>Organiser information</h2>
-      <Card id="event-card">
+      <Card>
         <ListGroup className="list-group-flush organiser-info">
           <ListGroup.Item>
             <div className="description">
@@ -58,24 +57,32 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
         className="mb-3"
       >
         <Tab eventKey="published-events" title="Published events">
-          {hasPublishedEvents ? (
-            events.map((event) =>
-              event.is_published ? <OrganiserEventCard event={event} /> : null,
-            )
-          ) : (
-            <p>There are no published events yet.</p>
-          )}
+          <div className="card-container">
+            {hasPublishedEvents ? (
+              events.map((event) =>
+                event.is_published ? (
+                  <OrganiserEventCard key={event.id} event={event} />
+                ) : null,
+              )
+            ) : (
+              <p>There are no published events yet.</p>
+            )}
+          </div>
         </Tab>
 
         {/* Draft Event Cards */}
         <Tab eventKey="draft-events" title="Draft events">
-          {hasPublishedEvents ? (
-            events.map((event) =>
-              !event.is_published ? <OrganiserEventCard event={event} /> : null,
-            )
-          ) : (
-            <p>There are no published events yet.</p>
-          )}
+          <div className="card-container">
+            {hasPublishedEvents ? (
+              events.map((event) =>
+                !event.is_published ? (
+                  <OrganiserEventCard key={event.id} event={event} />
+                ) : null,
+              )
+            ) : (
+              <p>There are no published events yet.</p>
+            )}
+          </div>
         </Tab>
       </Tabs>
     </main>

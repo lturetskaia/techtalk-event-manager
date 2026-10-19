@@ -31,12 +31,16 @@ export default function OrganiserEventCard({
             </div>
             <div>{event.create_date}</div>
           </ListGroup.Item>
-          <ListGroup.Item>
-            <div>
-              <b>Date published:</b>
-            </div>
-            <div>{event.publish_date}</div>
-          </ListGroup.Item>
+
+          {event.publish_date ? (
+            <ListGroup.Item>
+              <div>
+                <b>Date published:</b>
+              </div>
+              <div>{event.publish_date}</div>
+            </ListGroup.Item>
+          ) : null}
+
           {event.standardTickets ? (
             <ListGroup.Item>
               <div>
@@ -44,7 +48,7 @@ export default function OrganiserEventCard({
               </div>
               <div>
                 {event.standardTickets.total_quantity}{' '}
-                <i>Left: {event.standardTickets.quantity_left} </i>
+                <i>( Left: {event.standardTickets.quantity_left} ) </i>
               </div>
             </ListGroup.Item>
           ) : null}
@@ -56,7 +60,7 @@ export default function OrganiserEventCard({
               </div>
               <div>
                 {event.concessionTickets.total_quantity}{' '}
-                <i>Left: {event.concessionTickets.quantity_left} </i>
+                <i>( Left: {event.concessionTickets.quantity_left} )</i>
               </div>
             </ListGroup.Item>
           ) : null}
