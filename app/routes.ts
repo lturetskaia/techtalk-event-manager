@@ -10,7 +10,7 @@ export default [
   index('routes/main.tsx'),
   ...prefix('organiser', [
     route('login', './routes/organiser/login.tsx'),
-    layout('./routes/organiser/organiserMenu.tsx', [
+    layout('./routes/organiser/organiserNav.tsx', [
       route('dashboard', './routes/organiser/dashboard.tsx'),
       route('settings', './routes/organiser/settings.tsx'),
     ]),
