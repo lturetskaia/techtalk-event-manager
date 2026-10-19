@@ -22,39 +22,37 @@ router.get(
   verifyRole('ORGANISER'),
   async (req: Request, res: Response, next: NextFunction) => {
     console.log('Inside organiser dashboard');
-    // try {
-    //   // Get data from "organiser" table
-    //   const organiserQuery = 'SELECT * FROM organiser';
-    //   const organiser = await connection.query(organiserQuery);
+    try {
+      // Get data from "organiser" table
+      const organiserQuery = 'SELECT * FROM organiser';
+      const [organiser] = await connection.query(organiserQuery);
 
-    //   // Get data from "event" ordered by event date
-    //   const eventsQuery = 'SELECT * FROM event ORDER BY event.date ASC';
-    //   const eventsData = await fetchData(eventsQuery);
+      // Get data from "event" ordered by event date
+      const eventsQuery = `SELECT event.id, event.title, event.image_path, event.date, event.description, CONCAT_WS(',', location.building_name, CONCAT_WS(' ', location.building_number, location.street), location.city,location.country, location.postcode) AS address
+      FROM event 
+      JOIN location 
+      ON event.location_id=location.id
+      ORDER BY event.date ASC`;
+      const [eventsData] = await connection.query(eventsQuery);
 
-    //   // Get data from "ticketType"
-    //   const ticketsQuery = 'SELECT * FROM ticketType';
-    //   const ticketsData = await fetchData(ticketsQuery);
+      // Get data from "ticketType"
+      const ticketsQuery = 'SELECT * FROM ticketType';
+      const [ticketsData] = await connection.query(ticketsQuery);
 
-    //   //Create a new events array with compiled addresses
-    //   const events = [];
-    //   eventsData.forEach((event) => {
-    //     const formattedEvent = formatOrganiserEventData(event, ticketsData);
-    //     events.push(formattedEvent);
-    //   });
+      //Create a new events array with ticket types
+      const events = [];
+      // eventsData.forEach((event) => {
+      //   const formattedEvent = formatOrganiserEventData(event, ticketsData);
+      //   events.push(formattedEvent);
+      // });
 
-    //   res.render('pages/organiser/organiser-home.ejs', {
-    //     organiser: organiser[0],
-    //     events: events,
-    //     pageId: 'home',
-    //   });
-    //   } catch (err) {
-    //     next({
-    //       status: 500,
-    //       message: 'Failed to access event data. Please try again later.',
-    //     });
-    //   }
-
-    res.json({ message: 'Organiser dashboard' });
+      res.json({});
+    } catch (err) {
+      next({
+        status: 500,
+        message: 'Failed to access event data. Please try again later.',
+      });
+    }
   },
 );
 

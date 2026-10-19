@@ -1,6 +1,8 @@
 import type { Route } from './+types/dashboard';
 import { NavLink } from 'react-router';
 import { Card, ListGroup, Tab, Tabs } from 'react-bootstrap';
+import { useState } from 'react';
+import OrganiserEventCard from '../components/organiserEventCard';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -10,6 +12,8 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Dashboard() {
+  const [organiserData, setOrganiserData] = useState();
+  const [eventData, setEventData] = useState();
   return (
     <main>
       <NavLink to="/organiser/create-event" className="btn btn-primary">
@@ -33,19 +37,24 @@ export default function Dashboard() {
           </ListGroup.Item>
         </ListGroup>
       </Card>
+
       <h2>Events</h2>
+      {/* Published Event Cards */}
       <Tabs
-        defaultActiveKey="profile"
+        defaultActiveKey="published-events"
         id="uncontrolled-tab-example"
         className="mb-3"
       >
         <Tab eventKey="published-events" title="Published events">
           Tab content for Published events
         </Tab>
+
+        {/* Draft Event Cards */}
         <Tab eventKey="draft-events" title="Draft events">
           Tab content for Draft events
         </Tab>
       </Tabs>
+
       {/* // Tab content
     <div class="tab-content" id="eventsTabContent">
       <div class="tab-pane fade show active" id="published" role="tabpanel" aria-labelledby="home-tab">
