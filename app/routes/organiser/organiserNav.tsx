@@ -40,6 +40,9 @@ export default function OrganiserMenu() {
               <Nav.Link as={NavLink} to="/organiser/dashboard">
                 Dashboard
               </Nav.Link>
+              <Nav.Link as={NavLink} to="/organiser/create-event">
+                New Event
+              </Nav.Link>
               <Nav.Link as={NavLink} to="/organiser/site-settings">
                 Site Settings
               </Nav.Link>
