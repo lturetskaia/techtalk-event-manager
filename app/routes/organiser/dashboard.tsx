@@ -3,6 +3,7 @@ import { NavLink } from 'react-router';
 import { Card, ListGroup, Tab, Tabs } from 'react-bootstrap';
 import { useState } from 'react';
 import OrganiserEventCard from '../components/organiserEventCard';
+import { get } from './../../utils/http';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -11,7 +12,13 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export default function Dashboard() {
+export async function clientLoader() {
+  const data = await get('/organiser/dashboard');
+  console.log(data);
+  return data;
+}
+
+export default function Dashboard({ loaderData }: Route.ComponentProps) {
   const [organiserData, setOrganiserData] = useState();
   const [eventData, setEventData] = useState();
   return (

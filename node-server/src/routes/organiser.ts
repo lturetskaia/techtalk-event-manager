@@ -12,6 +12,8 @@ import {
 } from './../middleware/dataValidator.js';
 import { validationResult } from 'express-validator';
 import { requireAuth, verifyRole } from '../middleware/auth.js';
+import type { TicketTypeData, EventData } from '../utils/types.js';
+import { formatOrganiserEventData } from '../utils/helperFunctions.js';
 
 const router = express.Router();
 
@@ -33,20 +35,19 @@ router.get(
       JOIN location 
       ON event.location_id=location.id
       ORDER BY event.date ASC`;
-      const [eventsData] = await connection.query(eventsQuery);
+      const [eventsData] = await connection.query<EventData[]>(eventsQuery);
+      console.log(eventsData);
 
       // Get data from "ticketType"
       const ticketsQuery = 'SELECT * FROM ticketType';
-      const [ticketsData] = await connection.query(ticketsQuery);
+      const [ticketsData] =
+        await connection.query<TicketTypeData[]>(ticketsQuery);
+      console.log(ticketsData);
 
       //Create a new events array with ticket types
-      const events = [];
-      // eventsData.forEach((event) => {
-      //   const formattedEvent = formatOrganiserEventData(event, ticketsData);
-      //   events.push(formattedEvent);
-      // });
+      const events = formatOrganiserEventData(eventsData, ticketsData);
 
-      res.json({});
+      res.json({ events });
     } catch (err) {
       next({
         status: 500,
