@@ -179,64 +179,6 @@ app.post(
         message: 'Login successful',
         user: userPayload,
       });
-
-      // //compare passwords
-      // bcrypt.compare(
-      //   userData.password,
-      //   storedUserData[0]!.password_hash,
-      //   function (err, result) {
-      //     if (err) {
-      //       throw Error();
-      //     }
-
-      //     if (result) {
-      //       // req.session.regenerate((err) => {
-      //       //   if (err) {
-      //       //     return res.status(500).json({ message: 'Session error' });
-      //       //   }
-      //       // });
-
-      //       const userPayload = {
-      //         id: storedUserData[0]!.id,
-      //         role: storedUserData[0]!.is_organiser
-      //           ? UserRoles.ORGANISER
-      //           : UserRoles.ATTENDEE,
-      //       };
-
-      //       req.session.user = userPayload;
-
-      //       req.session.save((saveErr) => {
-      //         if (saveErr) {
-      //           return res
-      //             .status(500)
-      //             .json({ message: 'Failed to persist session' });
-      //         }
-      //         res.json({
-      //           message: 'Login successful',
-      //           user: userPayload,
-      //         });
-      //       });
-
-      //       console.log(
-      //         'Login successful, user role: ' +
-      //           userPayload.id +
-      //           ' ' +
-      //           userPayload.role,
-      //       );
-      //       // res.json({
-      //       //   message: 'Login successful',
-      //       //   user: userPayload,
-      //       // });
-      //     } else {
-      //       //return error page
-      //       return next({
-      //         status: 500,
-      //         message:
-      //           'The user with these credentials has not been found! Check your email and password and try again.',
-      //       });
-      //     }
-      //   },
-      // );
     } catch (err) {
       return next({ status: 500, message: 'Internal server error.' });
     }

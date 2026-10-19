@@ -305,7 +305,70 @@ router.get(
   '/profile',
   requireAuth,
   verifyRole('ATTENDEE'),
-  (req: Request, res: Response, next: NextFunction) => {},
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (!req.session.user) {
+        throw Error('User not logged in');
+      }
+      const userId = req.session.user.id;
+
+      //Get uder details from user table
+      const userQuery =
+        'SELECT user.email, user.first_name, user.last_name, user.phone FROM user WHERE id=? LIMIT 1';
+      const [userData] = await connection.query<UserDetails[]>(userQuery, [
+        userId,
+      ]);
+
+      res.json(userData[0]);
+    } catch (err) {
+      next({
+        status: 500,
+        message: 'Unable to get user data',
+      });
+    }
+  },
+);
+
+// POST EDIT PROFILE INFORMATION
+router.post(
+  '/profile',
+  requireAuth,
+  verifyRole('ATTENDEE'),
+  validateUser,
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userData = req.body;
+    const userId = req.session.user!.id;
+    const errors = validationResult(req);
+
+    //validate login data
+    if (!errors.isEmpty()) {
+      // If there are any errors, pass the error to error handling middleware
+      return next({
+        status: 400,
+        message: 'Bad input! Please check your profile details and try again.',
+      });
+    }
+
+    try {
+      //Update user details: first name, last name, email, phone
+      const updateUserQuery =
+        'UPDATE user SET first_name=?, last_name=?, email=?, phone=? WHERE id=?';
+      await connection.query(updateUserQuery, [
+        userData.first_name,
+        userData.last_name,
+        userData.email,
+        userData.phone,
+        userId,
+      ]);
+
+      res.json({ message: 'The profile details have been updated' });
+    } catch (err) {
+      next({
+        status: 500,
+        message: 'Failed to update profile details',
+      });
+    }
+  },
 );
 
 export default router;
