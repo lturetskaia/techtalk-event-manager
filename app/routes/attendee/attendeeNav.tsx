@@ -39,31 +39,18 @@ export default function AttendeeMenu() {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="navbarNavAltMarkup">
             <Nav variant="underline">
-              <Nav.Link as={NavLink} to="/attendee/events" eventKey="events">
+              <Nav.Link as={NavLink} to="/attendee/events">
                 Events
               </Nav.Link>
               {user && user.role === 'ATTENDEE' ? (
                 <>
-                  <Nav.Link
-                    as={NavLink}
-                    to="/attendee/my-bookings"
-                    eventKey="bookings"
-                  >
+                  <Nav.Link as={NavLink} to="/attendee/my-bookings">
                     My Bookings
                   </Nav.Link>
-                  <Nav.Link
-                    as={NavLink}
-                    to="/attendee/profile"
-                    eventKey="profile"
-                  >
+                  <Nav.Link as={NavLink} to="/attendee/profile">
                     Profile
                   </Nav.Link>
-                  <Nav.Link
-                    as={NavLink}
-                    to="/"
-                    onClick={handleLogout}
-                    eventKey="logout"
-                  >
+                  <Nav.Link as={NavLink} to="/" onClick={handleLogout}>
                     Log Out
                   </Nav.Link>
                 </>

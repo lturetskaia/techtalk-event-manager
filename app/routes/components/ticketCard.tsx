@@ -2,14 +2,13 @@ import Card from 'react-bootstrap/Card';
 import { ListGroup } from 'react-bootstrap';
 import type { UserTicketData } from '~/utils/types';
 import { NavLink } from 'react-router';
-import { Nav } from 'react-bootstrap';
 
 export default function TicketCard({ ticket }: { ticket: UserTicketData }) {
   const eventPath = '/attendee/events/' + ticket.event_id;
 
   return (
     <Card className="card" id="event-card">
-      <Nav.Link as={NavLink} to={eventPath} className="card-link"></Nav.Link>
+      <NavLink to={eventPath} className="card-link" />
 
       <div className="img-container">
         <img
