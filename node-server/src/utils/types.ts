@@ -8,6 +8,13 @@ export interface EventData extends RowDataPacket {
   address: string;
 }
 
+export interface OrganiserEventData extends EventData {
+  is_published: boolean;
+  publish_date: string;
+  create_date: string;
+  modified_date: string;
+}
+
 export interface OrganiserData extends RowDataPacket {
   id: number;
   name: string;

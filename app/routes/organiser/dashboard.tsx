@@ -4,6 +4,7 @@ import { Card, ListGroup, Tab, Tabs } from 'react-bootstrap';
 import { useState } from 'react';
 import OrganiserEventCard from '../components/organiserEventCard';
 import { get } from './../../utils/http';
+import type { OrganiserData, OrganiserEventData } from '~/utils/types';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -19,8 +20,12 @@ export async function clientLoader() {
 }
 
 export default function Dashboard({ loaderData }: Route.ComponentProps) {
-  const [organiserData, setOrganiserData] = useState();
-  const [eventData, setEventData] = useState();
+  const [organiser] = useState<OrganiserData>(loaderData.organiser);
+  const [events, setEvents] = useState<OrganiserEventData[]>(loaderData.events);
+
+  const hasPublishedEvents =
+    events.length > 0 && events.find((event) => event.is_published);
+
   return (
     <main>
       <NavLink to="/organiser/create-event" className="btn btn-primary">
@@ -34,13 +39,13 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
             <div className="description">
               <b>Company name:</b>
             </div>
-            <div className="info">Name </div>
+            <div className="info">{organiser.name}</div>
           </ListGroup.Item>
           <ListGroup.Item>
             <div className="description">
               <b>Description:</b>
             </div>
-            <div className="info">Something</div>
+            <div className="info">{organiser.description}</div>
           </ListGroup.Item>
         </ListGroup>
       </Card>
@@ -53,35 +58,26 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
         className="mb-3"
       >
         <Tab eventKey="published-events" title="Published events">
-          Tab content for Published events
+          {hasPublishedEvents ? (
+            events.map((event) =>
+              event.is_published ? <OrganiserEventCard event={event} /> : null,
+            )
+          ) : (
+            <p>There are no published events yet.</p>
+          )}
         </Tab>
 
         {/* Draft Event Cards */}
         <Tab eventKey="draft-events" title="Draft events">
-          Tab content for Draft events
+          {hasPublishedEvents ? (
+            events.map((event) =>
+              !event.is_published ? <OrganiserEventCard event={event} /> : null,
+            )
+          ) : (
+            <p>There are no published events yet.</p>
+          )}
         </Tab>
       </Tabs>
-
-      {/* // Tab content
-    <div class="tab-content" id="eventsTabContent">
-      <div class="tab-pane fade show active" id="published" role="tabpanel" aria-labelledby="home-tab">
-        <!-- Published Event Cards -->
-        <div class="card-container">
-          <% events.forEach ((event) => {if (event.is_published == true) {%>
-          <%- include("../../partials/organiser-event-card", {event}); %>
-          <% }}) %>
-        </div>
-      </div>
-
-      <div class="tab-pane fade" id="draft" role="tabpanel" aria-labelledby="profile-tab">
-        <!-- Published Event Cards -->
-        <div class="card-container">
-          <% events.forEach ((event) => { if (event.is_published == false) {%>
-          <%- include("../../partials/organiser-event-card", {event}); %>
-          <% }}) %>
-        </div>
-      </div>
-      </div> */}
     </main>
   );
 }
