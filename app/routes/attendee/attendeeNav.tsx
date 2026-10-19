@@ -2,7 +2,7 @@ import { Outlet } from 'react-router';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import { Link, useNavigate, NavLink } from 'react-router';
+import { useNavigate, NavLink } from 'react-router';
 import { useAuth } from '~/utils/AuthContext';
 
 export default function AttendeeMenu() {
@@ -38,32 +38,19 @@ export default function AttendeeMenu() {
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="navbarNavAltMarkup">
-            <Nav variant="underline" defaultActiveKey="events">
-              <Nav.Link as={NavLink} to="/attendee/events" eventKey="events">
+            <Nav variant="underline">
+              <Nav.Link as={NavLink} to="/attendee/events">
                 Events
               </Nav.Link>
               {user && user.role === 'ATTENDEE' ? (
                 <>
-                  <Nav.Link
-                    as={NavLink}
-                    to="/attendee/my-bookings"
-                    eventKey="bookings"
-                  >
+                  <Nav.Link as={NavLink} to="/attendee/my-bookings">
                     My Bookings
                   </Nav.Link>
-                  <Nav.Link
-                    as={NavLink}
-                    to="/attendee/profile"
-                    eventKey="profile"
-                  >
+                  <Nav.Link as={NavLink} to="/attendee/profile">
                     Profile
                   </Nav.Link>
-                  <Nav.Link
-                    as={NavLink}
-                    to="/"
-                    onClick={handleLogout}
-                    eventKey="logout"
-                  >
+                  <Nav.Link as={NavLink} to="/" onClick={handleLogout}>
                     Log Out
                   </Nav.Link>
                 </>

@@ -55,3 +55,13 @@ export interface AuthContextType {
   login: (loginData: LoginData) => Promise<UserLoginData>;
   logout: () => Promise<boolean>;
 }
+
+export interface UserTicketData {
+  id: number;
+  event_id: number;
+  ticket_type: string;
+  order_id: number;
+  title: string;
+  date: string;
+  address: string;
+}

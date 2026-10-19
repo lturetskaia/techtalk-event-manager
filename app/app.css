@@ -318,6 +318,16 @@ footer p {
 .alert-danger {
   font-size: 1rem;
 }
+
+#qr-image {
+  width: 50%;
+  margin: 0 auto;
+}
+.ticket-number {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
 /*
 .edit-btn {
   width: 20rem;
@@ -334,15 +344,8 @@ footer p {
 #description-card {
   margin-bottom: 3rem;
 }
-#qr-image {
-  width: 50%;
-  margin: 0 auto;
-}
 
-.ticket-number {
-  margin-top: 1rem;
-  font-size: 0.9rem;
-} 
+
 */
 @media (max-width: 991px) {
   .brand-container {

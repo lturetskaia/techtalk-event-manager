@@ -4,7 +4,9 @@ const requireAuth = (req: Request, res: Response, next: NextFunction) => {
   if (req.session.user && req.session.user.id) {
     return next(); // User is authenticated, continue to next middleware
   } else {
-    res.status(401).json({ message: 'User not autenticated.' });
+    res
+      .status(401)
+      .json({ message: 'Log in or create a new account to view this page.' });
   }
 };
 

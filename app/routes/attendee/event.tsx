@@ -19,7 +19,6 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 
 export default function Event({ loaderData }: Route.ComponentProps) {
   const [eventBookingData, setEventData] = useState(loaderData);
-  console.log(loaderData);
 
   return (
     <main>
