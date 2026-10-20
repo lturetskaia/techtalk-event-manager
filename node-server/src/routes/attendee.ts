@@ -3,7 +3,7 @@ import express, {
   type Request,
   type Response,
 } from 'express';
-import type { RowDataPacket, ResultSetHeader } from 'mysql2';
+import type { ResultSetHeader } from 'mysql2';
 import { connection } from './../app.js';
 import { format } from 'date-fns';
 import {
@@ -12,48 +12,14 @@ import {
 } from './../middleware/dataValidator.js';
 import { validationResult } from 'express-validator';
 import { requireAuth, verifyRole } from '../middleware/auth.js';
+import type {
+  EventData,
+  OrganiserData,
+  TicketTypeData,
+  UserDetails,
+  UserTicketData,
+} from '../utils/types.js';
 
-interface EventData extends RowDataPacket {
-  id: number;
-  title: string;
-  image_path: string;
-  date: string;
-  address: string;
-}
-
-interface OrganiserData extends RowDataPacket {
-  id: number;
-  name: string;
-  description: string;
-}
-
-interface TicketTypeData extends RowDataPacket {
-  id: number;
-  event_id: number;
-  type: string;
-  price: number;
-  quantity_left: number;
-  total_quantity: number;
-}
-
-interface UserDetails extends RowDataPacket {
-  id: number;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  is_organiser: boolean;
-}
-
-interface UserTicketData extends RowDataPacket {
-  id: number;
-  event_id: number;
-  ticket_type: string;
-  order_id: number;
-  title: string;
-  date: string;
-  address: string;
-}
 const router = express.Router();
 
 router.get('/events', async (req, res, next) => {

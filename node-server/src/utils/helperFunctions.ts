@@ -1,118 +1,45 @@
-// import 'date-fns';
+import type { TicketTypeData, EventData } from '../utils/types.js';
+import { format } from 'date-fns';
 
-// Formats attendee event data into an object
-// function formatAttendeeEventData(event) {
-//   let addressLine = '';
+// Merges organiser event and tickets data into an object
+export const formatOrganiserEventData = (
+  events: EventData[],
+  tickets: TicketTypeData[],
+) => {
+  events.forEach((event) => {
+    //find ticket types for the event
+    const standardTickets = tickets.find(
+      (ticketType) =>
+        ticketType.event_id === event.id && ticketType.type === 'standard',
+    );
 
-//   if (event.building_name) {
-//     addressLine += event.building_name + ', ';
-//   }
+    const concessionTickets = tickets.find(
+      (ticketType) =>
+        ticketType.event_id === event.id && ticketType.type === 'concession',
+    );
 
-//   if (event.building_number) {
-//     addressLine += event.building_number + ' ';
-//   }
+    // set ticket properties only if they exist
+    if (standardTickets) {
+      event.standardTickets = standardTickets;
+    }
+    if (concessionTickets) {
+      event.concessionTickets = concessionTickets;
+    }
 
-//   addressLine += `${event.street}, ${event.city}, ${event.country}, ${event.postcode}`;
+    event.modified_date = format(new Date(event.modified_date), 'PPp');
+    event.create_date = format(new Date(event.create_date), 'PPp');
+    event.date = format(new Date(event.date), 'PPp');
+    if (event.publish_date) {
+      event.publish_date = format(new Date(event.publish_date), 'PPp');
+    }
+  });
 
-//   const formattedEvent = {
-//     id: event.id,
-//     title: event.title,
-//     date: event.date,
-//     address: addressLine,
-//     description: event.description,
-//     image_path: event.image_path,
-//   };
+  return events;
+};
 
-//   return formattedEvent;
-// }
+export function getCurrentDateTime() {
+  let currDate = new Date();
+  currDate.toISOString().slice(0, 19).replace('T', ' ');
 
-// const formatAttendeeTicketData = (ticket) => {
-//   let addressLine = '';
-
-//   if (ticket.building_name) {
-//     addressLine += ticket.building_name + ', ';
-//   }
-
-//   if (ticket.building_number) {
-//     addressLine += ticket.building_number + ' ';
-//   }
-
-//   addressLine += `${ticket.street}, ${ticket.city}, ${ticket.country}, ${ticket.postcode}`;
-
-//   const formattedEvent = {
-//     id: ticket.id,
-//     event_title: ticket.title,
-//     event_date: ticket.date,
-//     address: addressLine,
-//     type: ticket.ticket_type,
-//     number: ticket.ticket_number,
-//   };
-
-//   return formattedEvent;
-// };
-
-// // Merges organiser event and tickets data into an object and formats dates
-// const formatOrganiserEventData = (event, tickets) => {
-//   //find tickets
-//   const standardTickets = tickets.find(
-//     (ticketType) =>
-//       ticketType.event_id === event.id && ticketType.type === 'standard',
-//   );
-
-//   const concessionTickets = tickets.find(
-//     (ticketType) =>
-//       ticketType.event_id === event.id && ticketType.type === 'concession',
-//   );
-
-//   const formattedEvent = {
-//     ...event,
-//   };
-
-//   // set ticket properties only if they exist
-//   if (standardTickets) {
-//     formattedEvent.standardTickets = standardTickets;
-//   }
-//   if (concessionTickets) {
-//     formattedEvent.concessionTickets = concessionTickets;
-//   }
-
-//   // format dates to Apr 29, 2027, 12:00 AM
-//   // formattedEvent.modified_date = format(new Date(formattedEvent.modified_date*1000), "PPp");
-//   // formattedEvent.create_date = format(new Date(formattedEvent.create_date*1000), "PPp");
-//   formattedEvent.modified_date = format(
-//     new Date(formattedEvent.modified_date),
-//     'PPp',
-//   );
-//   formattedEvent.create_date = format(
-//     new Date(formattedEvent.create_date),
-//     'PPp',
-//   );
-//   formattedEvent.date = format(new Date(formattedEvent.date), 'PPp');
-
-//   if (formattedEvent.publish_date) {
-//     formattedEvent.publish_date = format(
-//       new Date(formattedEvent.publish_date),
-//       'PPp',
-//     );
-//   }
-
-//   return formattedEvent;
-// };
-
-// // Get current date and time formatted to SQL datetime
-// function getCurrentDateTime() {
-//   let currDate = new Date();
-//   currDate.toISOString().slice(0, 19).replace('T', ' ');
-
-//   return currDate;
-// }
-
-// // Determines if attendee is logged in
-// const attendeeLoggedIn = (sessionData) => {
-//   if (sessionData.user && sessionData.user.role === 'attendee') {
-//     return true;
-//   }
-//   return false;
-// };
-
-// export { formatAttendeeEventData };
+  return currDate;
+}

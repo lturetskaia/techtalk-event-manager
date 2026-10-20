@@ -63,4 +63,23 @@ async function post(
   return responseData;
 }
 
-export { get, post };
+async function deleteEventData(path: string) {
+  const url = `http://localhost:3000${path}`;
+  const response = await fetch(url, {
+    method: 'DELETE',
+    credentials: 'include', //Required to send session cookies on page reload!
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  const responseData = await response.json();
+
+  if (!response.ok) {
+    throw Error(responseData.message);
+  }
+
+  return responseData;
+}
+
+export { get, post, deleteEventData };

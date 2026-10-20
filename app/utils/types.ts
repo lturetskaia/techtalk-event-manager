@@ -1,10 +1,19 @@
 export interface EventData {
-  id: string;
+  id: number;
   title: string;
   image_path: string;
   date: string;
   address: string;
   description: string;
+}
+
+export interface OrganiserEventData extends EventData {
+  is_published: boolean;
+  publish_date: string;
+  create_date: string;
+  modified_date: string;
+  concessionTickets: TicketData | null;
+  standardTickets: TicketData | null;
 }
 
 export interface TicketData {

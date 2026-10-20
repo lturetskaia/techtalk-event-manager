@@ -1,5 +1,7 @@
 import type { Route } from './+types/main';
 import BtnCard from './components/btnCard';
+import { useNavigate, NavLink } from 'react-router';
+import { useAuth } from '~/utils/AuthContext';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,6 +11,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Main() {
+  const { user } = useAuth();
   return (
     <main>
       <div className="main-header">
@@ -26,7 +29,11 @@ export default function Main() {
           title="For Organisers"
           description="Scale your reach, manage ticket sales, and track recent and upcoming events - all in one place."
           btnText="Enter Organiser Hub"
-          path="/organiser/dashboard"
+          path={
+            user?.role == 'ORGANISER'
+              ? '/organiser/dashboard'
+              : '/organiser/login'
+          }
         />
       </div>
     </main>
