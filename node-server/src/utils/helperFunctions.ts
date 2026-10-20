@@ -36,3 +36,10 @@ export const formatOrganiserEventData = (
 
   return events;
 };
+
+export function getCurrentDateTime() {
+  let currDate = new Date();
+  currDate.toISOString().slice(0, 19).replace('T', ' ');
+
+  return currDate;
+}

@@ -3,7 +3,7 @@ import { NavLink } from 'react-router';
 import { Card, ListGroup, Tab, Tabs } from 'react-bootstrap';
 import { useState } from 'react';
 import OrganiserEventCard from '../components/organiserEventCard';
-import { get } from './../../utils/http';
+import { get, post } from './../../utils/http';
 import type { OrganiserData, OrganiserEventData } from '~/utils/types';
 
 export function meta({}: Route.MetaArgs) {
@@ -22,13 +22,28 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
   const [organiser] = useState<OrganiserData>(loaderData.organiser);
   const [events, setEvents] = useState<OrganiserEventData[]>(loaderData.events);
 
-  const hasPublishedEvents =
-    events.length > 0 && events.find((event) => event.is_published);
+  const hasPublishedEvents = events.find((event) => event.is_published);
+  const hasDraftEvents = events.find((event) => !event.is_published);
+
+  async function handlePublishEvent(eventId: number) {
+    const path = `/organiser/events/${eventId}/publish`;
+    try {
+      await post(path);
+      const newData = await clientLoader();
+      setEvents(newData.events);
+    } catch (e) {
+      //error message
+    }
+  }
+
+  function handleDeleteEvent(eventId: number) {
+    console.log(eventId);
+    const path = `/organiser/events/${eventId}`;
+  }
 
   return (
     <main>
       <NavLink to="/organiser/create-event" className="btn btn-primary">
-        {' '}
         + Create new event
       </NavLink>
       <h2>Organiser information</h2>
@@ -61,7 +76,12 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
             {hasPublishedEvents ? (
               events.map((event) =>
                 event.is_published ? (
-                  <OrganiserEventCard key={event.id} event={event} />
+                  <OrganiserEventCard
+                    key={event.id}
+                    eventItem={event}
+                    handlePublishEvent={handlePublishEvent}
+                    handleDeleteEvent={handleDeleteEvent}
+                  />
                 ) : null,
               )
             ) : (
@@ -73,14 +93,19 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
         {/* Draft Event Cards */}
         <Tab eventKey="draft-events" title="Draft events">
           <div className="card-container">
-            {hasPublishedEvents ? (
+            {hasDraftEvents ? (
               events.map((event) =>
                 !event.is_published ? (
-                  <OrganiserEventCard key={event.id} event={event} />
+                  <OrganiserEventCard
+                    key={event.id}
+                    eventItem={event}
+                    handlePublishEvent={handlePublishEvent}
+                    handleDeleteEvent={handleDeleteEvent}
+                  />
                 ) : null,
               )
             ) : (
-              <p>There are no published events yet.</p>
+              <p>There are no draft events yet.</p>
             )}
           </div>
         </Tab>

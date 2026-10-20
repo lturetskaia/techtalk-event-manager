@@ -334,6 +334,12 @@ footer p {
   color: #3eabfe;
   border-bottom-color: var(--bg-primary);
 }
+.event-actions {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: row;
+  gap: 3rem;
+}
 
 /*
 .edit-btn {

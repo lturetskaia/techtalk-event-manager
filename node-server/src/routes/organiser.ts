@@ -18,6 +18,7 @@ import type {
   OrganiserData,
 } from '../utils/types.js';
 import { formatOrganiserEventData } from '../utils/helperFunctions.js';
+import { getCurrentDateTime } from '../utils/helperFunctions.js';
 
 const router = express.Router();
 
@@ -60,6 +61,36 @@ router.get(
         status: 500,
         message: 'Failed to access event data. Please try again later.',
       });
+    }
+  },
+);
+
+//CHANGE EVENT TO PUBLISHED  (is_published property of an event to true)
+router.post(
+  '/events/:id/publish',
+  requireAuth,
+  verifyRole('ORGANISER'),
+  async (req: Request, res: Response, next: NextFunction) => {
+    const eventId = req.params.id;
+    // Get formatted current date and time
+    const timestamp = getCurrentDateTime();
+    const is_published = true;
+
+    try {
+      //change event is_published state to true
+      const updateEventQuery =
+        'UPDATE event SET is_published=?, publish_date=? WHERE id=?';
+      await connection.query(updateEventQuery, [
+        is_published,
+        timestamp,
+        eventId,
+      ]);
+
+      return res.status(200).json({ message: 'The event has been published' });
+    } catch (error) {
+      res
+        .status(400)
+        .json({ message: 'Failed to update the requested event.' });
     }
   },
 );
