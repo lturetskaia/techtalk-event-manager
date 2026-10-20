@@ -95,4 +95,40 @@ router.post(
   },
 );
 
+//DELETE event, ticketTypes and ticketss for a specified event id
+router.delete(
+  '/events/:id',
+  requireAuth,
+  verifyRole('ORGANISER'),
+  async (req: Request, res: Response, next: NextFunction) => {
+    const eventId = req.params.id;
+
+    try {
+      await connection.query('BEGIN'); // start new transaction
+
+      //delete tickets with the specified event id from DB
+      const deleteTicketsQuery = 'DELETE FROM ticket WHERE event_id=?';
+      await connection.query(deleteTicketsQuery, [eventId]);
+
+      //delete ticketType with the specified event id from DB
+      const deleteTicketTypesQuery = 'DELETE FROM ticketType WHERE event_id=?';
+      await connection.query(deleteTicketTypesQuery, [eventId]);
+
+      //delete event with the specified event id from DB
+      const deleteEventQuery = 'DELETE FROM event WHERE id=?';
+      await connection.query(deleteEventQuery, [eventId]);
+
+      await connection.query('COMMIT'); // commit transaction
+      return res
+        .status(200)
+        .json({ message: 'The event was successfully deleted' });
+    } catch (error) {
+      await connection.query('ROLLBACK'); // rollback if there was an error
+      res
+        .status(400)
+        .json({ message: 'Failed to delete the requested event.' });
+    }
+  },
+);
+
 export default router;

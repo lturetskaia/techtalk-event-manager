@@ -3,7 +3,7 @@ import { NavLink } from 'react-router';
 import { Card, ListGroup, Tab, Tabs } from 'react-bootstrap';
 import { useState } from 'react';
 import OrganiserEventCard from '../components/organiserEventCard';
-import { get, post } from './../../utils/http';
+import { get, post, deleteEventData } from './../../utils/http';
 import type { OrganiserData, OrganiserEventData } from '~/utils/types';
 
 export function meta({}: Route.MetaArgs) {
@@ -36,9 +36,16 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
     }
   }
 
-  function handleDeleteEvent(eventId: number) {
+  async function handleDeleteEvent(eventId: number) {
     console.log(eventId);
     const path = `/organiser/events/${eventId}`;
+    try {
+      await deleteEventData(path);
+      const newData = await clientLoader();
+      setEvents(newData.events);
+    } catch (e) {
+      //error message
+    }
   }
 
   return (
