@@ -50,7 +50,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
 
   return (
     <main>
-      <NavLink to="/organiser/create-event" className="btn btn-primary">
+      <NavLink to="/organiser/events/new-event" className="btn btn-primary">
         + Create new event
       </NavLink>
       <h2>Organiser information</h2>

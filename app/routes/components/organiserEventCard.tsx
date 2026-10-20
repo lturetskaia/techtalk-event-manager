@@ -69,7 +69,10 @@ export default function OrganiserEventCard({
           ) : null}
         </ListGroup>
         <div className="event-actions">
-          <NavLink to="/organiser/create-event" className="btn btn-primary">
+          <NavLink
+            to={`/organiser/events/${eventItem.id}/edit`}
+            className="btn btn-primary"
+          >
             Edit
           </NavLink>
           {!eventItem.is_published ? (
@@ -82,7 +85,10 @@ export default function OrganiserEventCard({
             </Button>
           ) : null}
           {eventItem.is_published ? (
-            <NavLink to="/organiser/create-event" className="btn btn-secondary">
+            <NavLink
+              to={`/attendee/events/${eventItem.id}`}
+              className="btn btn-secondary"
+            >
               View
             </NavLink>
           ) : null}
