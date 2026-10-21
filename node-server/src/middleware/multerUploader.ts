@@ -18,7 +18,6 @@ const storage = multer.diskStorage({
     // Generates a unique filename using timestamp and a random number
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     const ext = path.extname(file.originalname);
-    console.log('Image file name generated ' + uniqueSuffix);
     callback(null, file.fieldname + '-' + uniqueSuffix + ext);
   },
 });
@@ -34,7 +33,6 @@ const fileFilter = (
     path.extname(file.originalname).toLowerCase(),
   );
   const mimeType = allowedTypes.test(file.mimetype);
-  console.log('Image file is extension is correct ' + mimeType);
 
   if (extName && mimeType) {
     return callback(null, true);

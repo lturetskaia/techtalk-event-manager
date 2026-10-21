@@ -155,8 +155,6 @@ router.post(
 
     const inputData = req.body;
     let imagePath = 'default-img.png';
-    console.log(inputData);
-    console.log(req.file);
 
     if (req.file) {
       //change image path if user provided an image
