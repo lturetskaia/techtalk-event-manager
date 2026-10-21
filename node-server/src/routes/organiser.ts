@@ -126,9 +126,9 @@ router.delete(
 
       await connection.query('COMMIT'); // commit transaction
 
-      const imageDir = './public/images';
-      if (fs.existsSync(imageDir) && imagePath !== 'default_image.png') {
-        fs.rmSync(imageDir + '/' + imagePath);
+      const path = './public/images/' + imagePath;
+      if (fs.existsSync(path) && imagePath !== 'default_image.png') {
+        fs.rmSync(path);
       }
 
       return res
