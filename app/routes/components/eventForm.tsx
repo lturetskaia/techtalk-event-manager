@@ -1,5 +1,6 @@
 import type { OrganiserEventData } from '~/utils/types';
 import { Form, Col } from 'react-bootstrap';
+import { useState } from 'react';
 
 export default function EventForm({
   handleSaveEvent,
@@ -8,12 +9,21 @@ export default function EventForm({
   handleSaveEvent: (formData: FormData) => Promise<void>;
   eventData: OrganiserEventData | null;
 }) {
+  const [imageURL, setImageURL] = useState<string | null>(null);
+
+  function handleChangeImage(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files![0];
+    if (file) {
+      const newURL = URL.createObjectURL(file);
+      setImageURL(newURL);
+    }
+  }
+
   async function handleFormSubmission(
     event: React.SubmitEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    // const data = Object.fromEntries(formData.entries());
 
     await handleSaveEvent(formData);
   }
@@ -51,22 +61,21 @@ export default function EventForm({
         ></Form.Control>
       </Col>
 
-      <Col xs={12} lg={4}>
-        <Form.Label htmlFor="event-image" className="form-label">
+      <Col xs={12} lg={4} id="event-image">
+        <Form.Label htmlFor="image-input" className="form-label">
           Event image
         </Form.Label>
         <Form.Control
+          onChange={handleChangeImage}
           accept="image/png, image/jpeg"
           type="file"
           aria-label="Event image"
-          id="event-image"
+          id="image-input"
           name="eventImage"
         />
-        <img
-          id="img-preview"
-          src="/images/default-img.png"
-          alt="Your event image"
-        />
+        {imageURL ? (
+          <img id="img-preview" src={imageURL} alt="Your event image" />
+        ) : null}
       </Col>
 
       <h3>Address and date</h3>
@@ -176,6 +185,7 @@ export default function EventForm({
           id="standard_quantity"
           name="standardQuantity"
           min={0}
+          defaultValue={0}
           aria-label="Number of standard tickets"
           required
         />
@@ -191,6 +201,7 @@ export default function EventForm({
           id="standard_price"
           name="standardPrice"
           aria-label="Standard tickets price in pounds"
+          defaultValue={0}
           min={0}
           required
         />
@@ -205,6 +216,7 @@ export default function EventForm({
           id="concession_quantity"
           name="concessionQuantity"
           aria-label="Number of concession tickets"
+          defaultValue={0}
           min={0}
           required
         />
@@ -220,6 +232,7 @@ export default function EventForm({
           id="concession_price"
           name="concessionPrice"
           aria-label="Concession tickets price in pounds"
+          defaultValue={0}
           min={0}
           required
         />

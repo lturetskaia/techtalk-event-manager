@@ -347,6 +347,10 @@ footer p {
   font-size: 1.2rem;
 }
 
+#event-image {
+  margin-bottom: 2rem;
+}
+
 #img-preview {
   margin-top: 1rem;
   width: 150px;
