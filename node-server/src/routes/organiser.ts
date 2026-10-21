@@ -9,6 +9,9 @@ import { format } from 'date-fns';
 import {
   validateBooking,
   validateUser,
+  validateEvent,
+  validateTicketType,
+  validateLocation,
 } from './../middleware/dataValidator.js';
 import { validationResult } from 'express-validator';
 import { requireAuth, verifyRole } from '../middleware/auth.js';
@@ -127,6 +130,100 @@ router.delete(
       res
         .status(400)
         .json({ message: 'Failed to delete the requested event.' });
+    }
+  },
+);
+
+// CREATE A NEW EVENT
+router.post(
+  '/events/new-event',
+  requireAuth,
+  verifyRole('ORGANISER'),
+  // upload.single('eventImage'),
+  validateEvent,
+  validateTicketType,
+  validateLocation,
+  async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req); // data validation result
+
+    if (!errors.isEmpty()) {
+      next({
+        status: 400,
+        message:
+          'Bad input! Please check the entered event information and try again.',
+      });
+    }
+
+    const inputData = req.body;
+    let imagePath = 'default-img.png';
+
+    try {
+      await connection.query('BEGIN');
+
+      // create a new location
+      const newLocationQuery =
+        'INSERT INTO location (postcode, country, city, street, building_number, building_name) VALUES (?,?,?,?,?,?)';
+      //returns the last created/modified id
+      const [locationResult] = await connection.query<ResultSetHeader>(
+        newLocationQuery,
+        [
+          inputData.postcode,
+          inputData.country,
+          inputData.city,
+          inputData.street,
+          inputData.buildingNumber,
+          inputData.buildingName,
+        ],
+      );
+
+      //create a new event
+      const newEventQuery =
+        'INSERT INTO event (create_date, modified_date, date, title, description, location_id, is_published, image_path) VALUES ( CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,?,?,?,?,?,?)';
+      const [eventResult] = await connection.query<ResultSetHeader>(
+        newEventQuery,
+        [
+          inputData.date,
+          inputData.title,
+          inputData.description,
+          locationResult.insertId,
+          false, //  new events are created as drafts
+          imagePath,
+        ],
+      );
+
+      // create a new standard ticket type
+      const newStandardTicketType =
+        'INSERT INTO ticketType (event_id, price, quantity_left, total_quantity, type) VALUES (?,?,?,?,?)';
+      await connection.query(newStandardTicketType, [
+        eventResult.insertId,
+        inputData.standardPrice,
+        inputData.standardQuantity,
+        inputData.standardQuantity,
+        'standard',
+      ]);
+
+      // create a new standard ticket type
+      const newConcessionTicketType =
+        'INSERT INTO ticketType (event_id, price, quantity_left, total_quantity, type) VALUES (?,?,?,?,?)';
+      await connection.query(newConcessionTicketType, [
+        eventResult.insertId,
+        inputData.concessionPrice,
+        inputData.concessionQuantity,
+        inputData.concessionQuantity,
+        'standard',
+      ]);
+
+      await connection.query('COMMIT');
+
+      res.json({ message: 'The new event has been created' });
+    } catch (err) {
+      console.log(err);
+      await connection.query('ROLLBACK');
+      next({
+        status: 500,
+        message:
+          'Failed to create a new event. Check the input or try again later.',
+      });
     }
   },
 );

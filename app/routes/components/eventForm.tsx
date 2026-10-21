@@ -1,12 +1,28 @@
-import { NavLink } from 'react-router';
+import type { OrganiserEventData } from '~/utils/types';
 import { Form, Col } from 'react-bootstrap';
 
-export default function EventForm() {
+export default function EventForm({
+  handleSaveEvent,
+  eventData = null,
+}: {
+  handleSaveEvent: (data: any) => Promise<void>;
+  eventData: OrganiserEventData | null;
+}) {
+  async function handleFormSubmission(
+    event: React.SubmitEvent<HTMLFormElement>,
+  ) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const data = Object.fromEntries(formData.entries());
+
+    await handleSaveEvent(data);
+  }
+
   return (
-    <Form className="row g-3 card">
+    <Form className="row g-3 card" onSubmit={handleFormSubmission}>
       <h3>General info</h3>
       <Col xs={12}>
-        <Form.Label for="eventTitle" class="form-label">
+        <Form.Label htmlFor="eventTitle" className="form-label">
           Event title
         </Form.Label>
         <Form.Control
@@ -15,12 +31,11 @@ export default function EventForm() {
           minLength={1}
           maxLength={50}
           aria-label="Event title"
-          value=""
           required
         />
       </Col>
       <Col xs={12}>
-        <Form.Label for="eventDescription" class="form-label">
+        <Form.Label htmlFor="eventDescription" className="form-label">
           Event description
         </Form.Label>
         <Form.Control
@@ -36,7 +51,7 @@ export default function EventForm() {
       </Col>
 
       <Col xs={12} lg={4}>
-        <Form.Label for="event-image" class="form-label">
+        <Form.Label htmlFor="event-image" className="form-label">
           Event image
         </Form.Label>
         <Form.Control
@@ -46,12 +61,12 @@ export default function EventForm() {
           id="eventImageInput"
           name="eventImage"
         />
-        <img id="img-preview" src="" alt="Your event image" />
+        <img id="img-preview" src="/default-img.png" alt="Your event image" />
       </Col>
 
       <h3>Address and date</h3>
       <Col lg={4}>
-        <Form.Label for="eventDate" class="form-label">
+        <Form.Label htmlFor="eventDate" className="form-label">
           Date
         </Form.Label>
         <Form.Control
@@ -63,7 +78,7 @@ export default function EventForm() {
         />
       </Col>
       <Col lg={4}>
-        <Form.Label for="postcode" class="form-label">
+        <Form.Label htmlFor="postcode" className="form-label">
           Postcode
         </Form.Label>
         <Form.Control
@@ -72,12 +87,11 @@ export default function EventForm() {
           minLength={1}
           maxLength={15}
           aria-label="Postcode"
-          value=""
           required
         />
       </Col>
       <Col lg={4}>
-        <Form.Label for="country" class="form-label">
+        <Form.Label htmlFor="country" className="form-label">
           Country
         </Form.Label>
         <Form.Control
@@ -87,12 +101,11 @@ export default function EventForm() {
           minLength={1}
           maxLength={50}
           aria-label="Country"
-          value=""
           required
         />
       </Col>
       <Col lg={6}>
-        <Form.Label for="city" class="form-label">
+        <Form.Label htmlFor="city" className="form-label">
           City
         </Form.Label>
         <Form.Control
@@ -102,12 +115,11 @@ export default function EventForm() {
           minLength={1}
           maxLength={50}
           aria-label="City"
-          value=""
           required
         />
       </Col>
       <Col lg={6}>
-        <Form.Label for="street" class="form-label">
+        <Form.Label htmlFor="street" className="form-label">
           Street
         </Form.Label>
         <Form.Control
@@ -117,13 +129,12 @@ export default function EventForm() {
           minLength={1}
           maxLength={50}
           aria-label="Street"
-          value=""
           required
         />
       </Col>
 
       <Col lg={6}>
-        <Form.Label for="building_number" class="form-label">
+        <Form.Label htmlFor="building_number" className="form-label">
           Building number
         </Form.Label>
         <Form.Control
@@ -133,11 +144,10 @@ export default function EventForm() {
           minLength={1}
           maxLength={10}
           aria-label="Building number"
-          value=""
         />
       </Col>
       <Col lg={6}>
-        <Form.Label for="building_name" class="form-label">
+        <Form.Label htmlFor="building_name" className="form-label">
           Building name
         </Form.Label>
         <Form.Control
@@ -147,14 +157,13 @@ export default function EventForm() {
           minLength={1}
           maxLength={50}
           aria-label="Building name"
-          value=""
         />
       </Col>
 
       <h3>Tickets</h3>
 
       <Col lg={6}>
-        <Form.Label for="standard_quantity" class="form-label">
+        <Form.Label htmlFor="standard_quantity" className="form-label">
           Number of standard tickets
         </Form.Label>
         <Form.Control
@@ -163,13 +172,12 @@ export default function EventForm() {
           name="standardQuantity"
           min={0}
           aria-label="Number of standard tickets"
-          value=""
           required
         />
       </Col>
 
       <Col lg={6}>
-        <Form.Label for="standard_price" class="form-label">
+        <Form.Label htmlFor="standard_price" className="form-label">
           Standard tickets price (&pound;)
         </Form.Label>
         <Form.Control
@@ -179,13 +187,12 @@ export default function EventForm() {
           name="standardPrice"
           aria-label="Standard tickets price in pounds"
           min={0}
-          value=""
           required
         />
       </Col>
 
       <Col lg={6}>
-        <Form.Label for="concession_quantity" class="form-label">
+        <Form.Label htmlFor="concession_quantity" className="form-label">
           Number of concession tickets
         </Form.Label>
         <Form.Control
@@ -194,13 +201,12 @@ export default function EventForm() {
           name="concessionQuantity"
           aria-label="Number of concession tickets"
           min={0}
-          value=""
           required
         />
       </Col>
 
       <Col lg={6}>
-        <Form.Label for="concession_price" class="form-label">
+        <Form.Label htmlFor="concession_price" className="form-label">
           Concession tickets price (&pound;)
         </Form.Label>
         <Form.Control
@@ -210,7 +216,6 @@ export default function EventForm() {
           name="concessionPrice"
           aria-label="Concession tickets price in pounds"
           min={0}
-          value=""
           required
         />
       </Col>
