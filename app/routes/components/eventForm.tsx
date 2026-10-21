@@ -5,7 +5,7 @@ export default function EventForm({
   handleSaveEvent,
   eventData = null,
 }: {
-  handleSaveEvent: (data: any) => Promise<void>;
+  handleSaveEvent: (formData: FormData) => Promise<void>;
   eventData: OrganiserEventData | null;
 }) {
   async function handleFormSubmission(
@@ -13,9 +13,9 @@ export default function EventForm({
   ) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const data = Object.fromEntries(formData.entries());
+    // const data = Object.fromEntries(formData.entries());
 
-    await handleSaveEvent(data);
+    await handleSaveEvent(formData);
   }
 
   return (
@@ -26,6 +26,7 @@ export default function EventForm({
           Event title
         </Form.Label>
         <Form.Control
+          id="eventTitle"
           type="text"
           name="title"
           minLength={1}
@@ -58,10 +59,14 @@ export default function EventForm({
           accept="image/png, image/jpeg"
           type="file"
           aria-label="Event image"
-          id="eventImageInput"
+          id="event-image"
           name="eventImage"
         />
-        <img id="img-preview" src="/default-img.png" alt="Your event image" />
+        <img
+          id="img-preview"
+          src="/images/default-img.png"
+          alt="Your event image"
+        />
       </Col>
 
       <h3>Address and date</h3>

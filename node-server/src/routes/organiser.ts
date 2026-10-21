@@ -22,6 +22,7 @@ import type {
 } from '../utils/types.js';
 import { formatOrganiserEventData } from '../utils/helperFunctions.js';
 import { getCurrentDateTime } from '../utils/helperFunctions.js';
+import { upload } from '../middleware/multerUploader.js';
 
 const router = express.Router();
 
@@ -31,7 +32,6 @@ router.get(
   requireAuth,
   verifyRole('ORGANISER'),
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log('Inside organiser dashboard');
     try {
       // Get data from "organiser" table
       const organiserQuery = 'SELECT * FROM organiser';
@@ -48,7 +48,6 @@ router.get(
       ORDER BY event.date ASC`;
       const [eventsData] =
         await connection.query<OrganiserEventData[]>(eventsQuery);
-      console.log(eventsData);
 
       // Get data from "ticketType"
       const ticketsQuery = 'SELECT * FROM ticketType';
@@ -139,7 +138,7 @@ router.post(
   '/events/new-event',
   requireAuth,
   verifyRole('ORGANISER'),
-  // upload.single('eventImage'),
+  upload.single('eventImage'), //upload the attached image
   validateEvent,
   validateTicketType,
   validateLocation,
@@ -156,6 +155,14 @@ router.post(
 
     const inputData = req.body;
     let imagePath = 'default-img.png';
+    console.log(inputData);
+    console.log(req.file);
+
+    if (req.file) {
+      //change image path if user provided an image
+      imagePath = req.file.filename;
+      imagePath = imagePath.replace('./public', '');
+    }
 
     try {
       await connection.query('BEGIN');
@@ -210,7 +217,7 @@ router.post(
         inputData.concessionPrice,
         inputData.concessionQuantity,
         inputData.concessionQuantity,
-        'standard',
+        'concession',
       ]);
 
       await connection.query('COMMIT');

@@ -11,7 +11,7 @@ export default function EventCard({
   image_path,
 }: EventData) {
   const eventPath = '/attendee/events/' + id;
-  const imageURL = '/' + image_path;
+  const imageURL = 'http://localhost:3000/images/' + image_path;
 
   return (
     <Card className="card" id="event-card">

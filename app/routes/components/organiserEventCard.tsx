@@ -12,7 +12,7 @@ export default function OrganiserEventCard({
   handleDeleteEvent: (eventId: number) => void;
 }) {
   const eventPath = '/attendee/events/' + eventItem.id;
-  const imageURL = '/' + eventItem.image_path;
+  const imageURL = 'http://localhost:3000/images/' + eventItem.image_path;
 
   return (
     <Card className="card" id="event-card">

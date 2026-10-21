@@ -2,7 +2,7 @@ import type { Route } from '../+types/main';
 import { NavLink } from 'react-router';
 import { useNavigate } from 'react-router';
 import EventForm from '../components/eventForm';
-import { post } from '~/utils/http';
+import { postMultipartData } from '~/utils/http';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -13,9 +13,12 @@ export function meta({}: Route.MetaArgs) {
 
 export default function NewEvent() {
   const navigate = useNavigate();
-  async function handleSaveEvent(data: any) {
+  async function handleSaveEvent(formData: FormData) {
     try {
-      const response = await post('/organiser/events/new-event', data);
+      const response = await postMultipartData(
+        '/organiser/events/new-event',
+        formData,
+      );
       navigate('/organiser/dashboard');
     } catch (e) {
       //show error message
