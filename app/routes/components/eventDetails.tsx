@@ -11,7 +11,7 @@ export default function EventDetails({
   event: EventData;
   tickets: TicketData[];
 }) {
-  const imageURL = '/' + event.image_path;
+  const imageURL = 'http://localhost:3000/images/' + event.image_path;
 
   return (
     <Card className="card event-details">

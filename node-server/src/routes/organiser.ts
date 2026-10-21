@@ -3,12 +3,12 @@ import express, {
   type Request,
   type Response,
 } from 'express';
-import type { RowDataPacket, ResultSetHeader } from 'mysql2';
+import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { connection } from './../app.js';
-import { format } from 'date-fns';
 import {
-  validateBooking,
-  validateUser,
+  validateEvent,
+  validateTicketType,
+  validateLocation,
 } from './../middleware/dataValidator.js';
 import { validationResult } from 'express-validator';
 import { requireAuth, verifyRole } from '../middleware/auth.js';
@@ -19,6 +19,8 @@ import type {
 } from '../utils/types.js';
 import { formatOrganiserEventData } from '../utils/helperFunctions.js';
 import { getCurrentDateTime } from '../utils/helperFunctions.js';
+import { upload } from '../middleware/multerUploader.js';
+import fs from 'fs';
 
 const router = express.Router();
 
@@ -28,7 +30,6 @@ router.get(
   requireAuth,
   verifyRole('ORGANISER'),
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log('Inside organiser dashboard');
     try {
       // Get data from "organiser" table
       const organiserQuery = 'SELECT * FROM organiser';
@@ -45,7 +46,6 @@ router.get(
       ORDER BY event.date ASC`;
       const [eventsData] =
         await connection.query<OrganiserEventData[]>(eventsQuery);
-      console.log(eventsData);
 
       // Get data from "ticketType"
       const ticketsQuery = 'SELECT * FROM ticketType';
@@ -104,6 +104,12 @@ router.delete(
     const eventId = req.params.id;
 
     try {
+      const imagePathQuery = 'SELECT image_path FROM event WHERE id=?';
+      const [result] = await connection.query<RowDataPacket[]>(imagePathQuery, [
+        eventId,
+      ]);
+      const imagePath = result[0]?.image_path;
+
       await connection.query('BEGIN'); // start new transaction
 
       //delete tickets with the specified event id from DB
@@ -119,14 +125,121 @@ router.delete(
       await connection.query(deleteEventQuery, [eventId]);
 
       await connection.query('COMMIT'); // commit transaction
+
+      const imageDir = './public/images';
+      if (fs.existsSync(imageDir) && imagePath !== 'default_image.png') {
+        fs.rmSync(imageDir + '/' + imagePath);
+      }
+
       return res
         .status(200)
         .json({ message: 'The event was successfully deleted' });
     } catch (error) {
+      console.log(error);
       await connection.query('ROLLBACK'); // rollback if there was an error
       res
         .status(400)
         .json({ message: 'Failed to delete the requested event.' });
+    }
+  },
+);
+
+// CREATE A NEW EVENT
+router.post(
+  '/events/new-event',
+  requireAuth,
+  verifyRole('ORGANISER'),
+  upload.single('eventImage'), //upload the attached image
+  validateEvent,
+  validateTicketType,
+  validateLocation,
+  async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req); // data validation result
+
+    if (!errors.isEmpty()) {
+      next({
+        status: 400,
+        message:
+          'Bad input! Please check the entered event information and try again.',
+      });
+    }
+
+    const inputData = req.body;
+    let imagePath = 'default-img.png';
+
+    if (req.file) {
+      //change image path if user provided an image
+      imagePath = req.file.filename;
+      imagePath = imagePath.replace('./public', '');
+    }
+
+    try {
+      await connection.query('BEGIN');
+
+      // create a new location
+      const newLocationQuery =
+        'INSERT INTO location (postcode, country, city, street, building_number, building_name) VALUES (?,?,?,?,?,?)';
+      //returns the last created/modified id
+      const [locationResult] = await connection.query<ResultSetHeader>(
+        newLocationQuery,
+        [
+          inputData.postcode,
+          inputData.country,
+          inputData.city,
+          inputData.street,
+          inputData.buildingNumber,
+          inputData.buildingName,
+        ],
+      );
+
+      //create a new event
+      const newEventQuery =
+        'INSERT INTO event (create_date, modified_date, date, title, description, location_id, is_published, image_path) VALUES ( CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,?,?,?,?,?,?)';
+      const [eventResult] = await connection.query<ResultSetHeader>(
+        newEventQuery,
+        [
+          inputData.date,
+          inputData.title,
+          inputData.description,
+          locationResult.insertId,
+          false, //  new events are created as drafts
+          imagePath,
+        ],
+      );
+
+      // create a new standard ticket type
+      const newStandardTicketType =
+        'INSERT INTO ticketType (event_id, price, quantity_left, total_quantity, type) VALUES (?,?,?,?,?)';
+      await connection.query(newStandardTicketType, [
+        eventResult.insertId,
+        inputData.standardPrice,
+        inputData.standardQuantity,
+        inputData.standardQuantity,
+        'standard',
+      ]);
+
+      // create a new standard ticket type
+      const newConcessionTicketType =
+        'INSERT INTO ticketType (event_id, price, quantity_left, total_quantity, type) VALUES (?,?,?,?,?)';
+      await connection.query(newConcessionTicketType, [
+        eventResult.insertId,
+        inputData.concessionPrice,
+        inputData.concessionQuantity,
+        inputData.concessionQuantity,
+        'concession',
+      ]);
+
+      await connection.query('COMMIT');
+
+      res.json({ message: 'The new event has been created' });
+    } catch (err) {
+      console.log(err);
+      await connection.query('ROLLBACK');
+      next({
+        status: 500,
+        message:
+          'Failed to create a new event. Check the input or try again later.',
+      });
     }
   },
 );

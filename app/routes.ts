@@ -13,6 +13,7 @@ export default [
     layout('./routes/organiser/organiserNav.tsx', [
       route('dashboard', './routes/organiser/dashboard.tsx'),
       route('settings', './routes/organiser/settings.tsx'),
+      route('events/new-event', './routes/organiser/newEvent.tsx'),
     ]),
   ]),
   ...prefix('attendee', [

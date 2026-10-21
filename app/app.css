@@ -39,7 +39,7 @@ body::after {
 }
 
 main {
-  margin: auto;
+  margin: 0 auto 3rem auto;
   padding: 1rem;
   max-width: 1200px;
 }
@@ -88,7 +88,7 @@ h1 {
 }
 
 .btn {
-  margin: 1rem 0;
+  margin-top: 1rem;
   padding: 0.65rem 1.1rem;
   font-size: 1.2rem;
 }
@@ -147,6 +147,7 @@ footer p {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
   padding: 1.5rem;
+  /* margin: 3rem 0 5rem 0; */
   text-align: justify;
   align-items: center;
   color: var(--text-primary);
@@ -335,18 +336,29 @@ footer p {
   border-bottom-color: var(--bg-primary);
 }
 .event-actions {
-  margin-top: 2rem;
+  margin-top: 1rem;
   display: flex;
   flex-direction: row;
   gap: 3rem;
 }
-
-/*
 .edit-btn {
   width: 20rem;
   margin: 4rem auto 1rem auto;
   font-size: 1.2rem;
 }
+
+#event-image {
+  margin-bottom: 3rem;
+}
+
+#img-preview {
+  margin-top: 1rem;
+  width: 150px;
+  height: auto;
+}
+
+/*
+
 
 
 .start-uppercase::first-letter {

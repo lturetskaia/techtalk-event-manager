@@ -191,7 +191,7 @@ export default function BookingForm({
           {tickets.map((ticket) => {
             if (ticket.quantity_left > 0) {
               return (
-                <tr className="table-row" key={ticket.type}>
+                <tr className="table-row" key={ticket.id}>
                   <td className="start-uppercase">{ticket.type}</td>
                   <td>&pound; {ticket.price}</td>
                   <td>

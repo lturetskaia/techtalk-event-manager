@@ -63,6 +63,23 @@ async function post(
   return responseData;
 }
 
+async function postMultipartData(path: string, data: FormData) {
+  const url = `http://localhost:3000${path}`;
+  const response = await fetch(url, {
+    method: 'POST',
+    credentials: 'include',
+    body: data,
+  });
+
+  const responseData = await response.json();
+
+  if (!response.ok) {
+    throw Error(responseData.message);
+  }
+
+  return responseData;
+}
+
 async function deleteEventData(path: string) {
   const url = `http://localhost:3000${path}`;
   const response = await fetch(url, {
@@ -82,4 +99,4 @@ async function deleteEventData(path: string) {
   return responseData;
 }
 
-export { get, post, deleteEventData };
+export { get, post, deleteEventData, postMultipartData };
