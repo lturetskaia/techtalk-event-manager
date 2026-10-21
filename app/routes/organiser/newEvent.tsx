@@ -17,11 +17,12 @@ export default function NewEvent() {
         {' '}
         &larr; Back to the dashboard
       </NavLink>
-      <div className="main-header">
-        <h2>New event</h2>
-      </div>
 
-      <EventForm />
+      <h2>New event</h2>
+
+      <div className="card-container">
+        <EventForm />
+      </div>
     </main>
   );
 }
