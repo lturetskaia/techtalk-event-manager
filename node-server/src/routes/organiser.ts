@@ -3,12 +3,9 @@ import express, {
   type Request,
   type Response,
 } from 'express';
-import type { RowDataPacket, ResultSetHeader } from 'mysql2';
+import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { connection } from './../app.js';
-import { format } from 'date-fns';
 import {
-  validateBooking,
-  validateUser,
   validateEvent,
   validateTicketType,
   validateLocation,
@@ -23,6 +20,7 @@ import type {
 import { formatOrganiserEventData } from '../utils/helperFunctions.js';
 import { getCurrentDateTime } from '../utils/helperFunctions.js';
 import { upload } from '../middleware/multerUploader.js';
+import fs from 'fs';
 
 const router = express.Router();
 
@@ -106,6 +104,12 @@ router.delete(
     const eventId = req.params.id;
 
     try {
+      const imagePathQuery = 'SELECT image_path FROM event WHERE id=?';
+      const [result] = await connection.query<RowDataPacket[]>(imagePathQuery, [
+        eventId,
+      ]);
+      const imagePath = result[0]?.image_path;
+
       await connection.query('BEGIN'); // start new transaction
 
       //delete tickets with the specified event id from DB
@@ -121,10 +125,17 @@ router.delete(
       await connection.query(deleteEventQuery, [eventId]);
 
       await connection.query('COMMIT'); // commit transaction
+
+      const imageDir = './public/images';
+      if (fs.existsSync(imageDir) && imagePath !== 'default_image.png') {
+        fs.rmSync(imageDir + '/' + imagePath);
+      }
+
       return res
         .status(200)
         .json({ message: 'The event was successfully deleted' });
     } catch (error) {
+      console.log(error);
       await connection.query('ROLLBACK'); // rollback if there was an error
       res
         .status(400)
