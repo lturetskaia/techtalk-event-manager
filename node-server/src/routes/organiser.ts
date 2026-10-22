@@ -159,9 +159,23 @@ router.post(
   validateLocation,
   async (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req); // data validation result
-    console.log(errors);
+
+    let imagePath = 'default-img.png';
+
+    if (req.file) {
+      //change image path if user provided an image
+      imagePath = req.file.filename;
+      // imagePath = imagePath.replace('./public', '');
+    }
 
     if (!errors.isEmpty()) {
+      const path = './public/images/' + imagePath;
+
+      //delete the saved image
+      if (fs.existsSync(path) && imagePath !== 'default_img.png') {
+        fs.rmSync(path);
+      }
+
       return next({
         status: 400,
         message:
@@ -170,13 +184,6 @@ router.post(
     }
 
     const inputData = req.body;
-    let imagePath = 'default-img.png';
-
-    if (req.file) {
-      //change image path if user provided an image
-      imagePath = req.file.filename;
-      imagePath = imagePath.replace('./public', '');
-    }
 
     try {
       await connection.query('BEGIN');
@@ -240,6 +247,14 @@ router.post(
     } catch (err) {
       console.log(err);
       await connection.query('ROLLBACK');
+
+      const path = './public/images/' + imagePath;
+
+      //delete the saved image
+      if (fs.existsSync(path) && imagePath !== 'default_img.png') {
+        fs.rmSync(path);
+      }
+
       next({
         status: 500,
         message:
