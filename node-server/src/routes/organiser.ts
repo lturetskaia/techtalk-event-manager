@@ -129,7 +129,9 @@ router.delete(
       await connection.query('COMMIT'); // commit transaction
 
       const path = './public/images/' + imagePath;
-      if (fs.existsSync(path) && imagePath !== 'default_image.png') {
+
+      //skip deleting the default image
+      if (fs.existsSync(path) && imagePath !== 'default_img.png') {
         fs.rmSync(path);
       }
 
@@ -157,9 +159,10 @@ router.post(
   validateLocation,
   async (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req); // data validation result
+    console.log(errors);
 
     if (!errors.isEmpty()) {
-      next({
+      return next({
         status: 400,
         message:
           'Bad input! Please check the entered event information and try again.',
@@ -312,7 +315,7 @@ router.get(
   },
 );
 
-// EDIT AN EXISTING EVENT
+// EDIT AN EXISTING DRAFT EVENT
 router.post(
   '/events/:id/edit',
   requireAuth,
@@ -337,6 +340,23 @@ router.post(
     let imagePath;
 
     try {
+      //verify the event is draft
+      const eventStatusQuery = 'SELECT is_published FROM event WHERE id=?';
+      const [eventStatusQueryResult] = await connection.query<RowDataPacket[]>(
+        eventStatusQuery,
+        [eventId],
+      );
+      console.log(eventStatusQueryResult[0]);
+      const isDraftEvent =
+        eventStatusQueryResult[0] &&
+        eventStatusQueryResult[0].is_published == false;
+      if (!isDraftEvent) {
+        return next({
+          status: 400,
+          message: 'Published events cannot be edited.',
+        });
+      }
+
       //get image path
       if (req.file) {
         //change image path if user provided an image

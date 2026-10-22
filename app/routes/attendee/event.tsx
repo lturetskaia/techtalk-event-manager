@@ -13,7 +13,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-  const eventData = await get(`/organiser/events/${params.eventId}`);
+  const eventData = await get(`/attendee/events/${params.eventId}`);
   return eventData;
 }
 

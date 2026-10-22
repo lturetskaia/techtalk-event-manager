@@ -361,6 +361,14 @@ footer p {
   height: auto;
 }
 
+.pop-up-alert {
+  display: block;
+  width: fit-content;
+  position: fixed;
+  bottom: 0;
+  right: 10px;
+}
+
 /*
 
 
