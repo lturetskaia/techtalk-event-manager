@@ -33,8 +33,8 @@ export default function EditEvent({
         formData,
       );
       navigate('/organiser/dashboard');
-    } catch (e) {
-      //show error message
+    } catch (err: any) {
+      throw Error(err.message);
     }
   }
   return (

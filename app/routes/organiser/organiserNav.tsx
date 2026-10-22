@@ -13,8 +13,7 @@ export default function OrganiserMenu() {
     event.preventDefault();
 
     try {
-      // const result = await logout();
-      throw Error;
+      const result = await logout();
       navigate('/');
     } catch (err) {
       setLogoutAlert('Failed to log out.');

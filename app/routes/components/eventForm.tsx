@@ -1,6 +1,6 @@
 import type { OrganiserRawEventData } from '~/utils/types';
-import { Form, Col } from 'react-bootstrap';
-import { useState, useEffect } from 'react';
+import { Form, Col, Alert } from 'react-bootstrap';
+import { useState } from 'react';
 
 export default function EventForm({
   handleSaveEvent,
@@ -19,6 +19,7 @@ export default function EventForm({
 
   const [imageURL, setImageURL] = useState<string>(imgPath);
   const [event, setEvent] = useState<OrganiserRawEventData | null>(eventData);
+  const [error, setError] = useState({ isError: false, message: '' });
 
   function handleChangeImage(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files![0];
@@ -33,8 +34,19 @@ export default function EventForm({
   ) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-
-    await handleSaveEvent(formData);
+    try {
+      await handleSaveEvent(formData);
+    } catch (err: any) {
+      if (err.message) {
+        setError({ isError: true, message: err.message });
+      } else {
+        setError({
+          isError: true,
+          message: 'Unable to save the event. Check the input and try again.',
+        });
+      }
+      setTimeout(() => setError({ isError: false, message: '' }), 5000);
+    }
   }
 
   return (
@@ -259,6 +271,10 @@ export default function EventForm({
       <button type="submit" className="btn btn-primary edit-btn">
         Save
       </button>
+
+      <Alert show={error.isError} variant="danger">
+        {error.message}
+      </Alert>
     </Form>
   );
 }
