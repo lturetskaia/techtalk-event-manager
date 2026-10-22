@@ -29,7 +29,6 @@ export default function LoginForm() {
 
     try {
       const loggedInUser = await login(loginData);
-      console.log(loggedInUser);
       //redirect to /organiser/dashboard or attendee/my-bookings
       if (loggedInUser.role === 'ORGANISER') {
         navigate('/organiser/dashboard');

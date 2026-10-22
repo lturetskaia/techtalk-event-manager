@@ -1,12 +1,12 @@
-import { Outlet } from 'react-router';
+import { Outlet, useNavigate, NavLink } from 'react-router';
 import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import { useNavigate, NavLink } from 'react-router';
+import { Nav, Navbar, Alert } from 'react-bootstrap';
 import { useAuth } from '~/utils/AuthContext';
+import { useState } from 'react';
 
 export default function OrganiserMenu() {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
+  const [logoutAlert, setLogoutAlert] = useState('');
   const navigate = useNavigate();
 
   async function handleLogout(event: React.MouseEvent) {
@@ -16,7 +16,8 @@ export default function OrganiserMenu() {
       const result = await logout();
       navigate('/');
     } catch (err) {
-      console.log(err);
+      setLogoutAlert('Failed to log out.');
+      setTimeout(() => setLogoutAlert(''), 5000);
     }
   }
 
@@ -43,9 +44,6 @@ export default function OrganiserMenu() {
               <Nav.Link as={NavLink} to="/organiser/events/new-event">
                 New Event
               </Nav.Link>
-              <Nav.Link as={NavLink} to="/organiser/site-settings">
-                Site Settings
-              </Nav.Link>
               <Nav.Link as={NavLink} to="/" onClick={handleLogout}>
                 Log Out
               </Nav.Link>
@@ -54,6 +52,13 @@ export default function OrganiserMenu() {
         </Container>
       </Navbar>
       <Outlet />
+      <Alert
+        show={logoutAlert !== ''}
+        className="pop-up-alert"
+        variant="danger"
+      >
+        {logoutAlert}
+      </Alert>
     </>
   );
 }

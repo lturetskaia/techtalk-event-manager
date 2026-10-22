@@ -1,5 +1,5 @@
-import type { OrganiserEventData } from '~/utils/types';
-import { Form, Col } from 'react-bootstrap';
+import type { OrganiserRawEventData } from '~/utils/types';
+import { Form, Col, Alert } from 'react-bootstrap';
 import { useState } from 'react';
 
 export default function EventForm({
@@ -7,9 +7,19 @@ export default function EventForm({
   eventData = null,
 }: {
   handleSaveEvent: (formData: FormData) => Promise<void>;
-  eventData: OrganiserEventData | null;
+  eventData: OrganiserRawEventData | null;
 }) {
-  const [imageURL, setImageURL] = useState<string | null>(null);
+  let imgPath = 'http://localhost:3000/images/';
+
+  if (eventData?.image_path) {
+    imgPath += eventData.image_path;
+  } else {
+    imgPath += 'default-img.png';
+  }
+
+  const [imageURL, setImageURL] = useState<string>(imgPath);
+  const [event, setEvent] = useState<OrganiserRawEventData | null>(eventData);
+  const [error, setError] = useState({ isError: false, message: '' });
 
   function handleChangeImage(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files![0];
@@ -24,8 +34,19 @@ export default function EventForm({
   ) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-
-    await handleSaveEvent(formData);
+    try {
+      await handleSaveEvent(formData);
+    } catch (err: any) {
+      if (err.message) {
+        setError({ isError: true, message: err.message });
+      } else {
+        setError({
+          isError: true,
+          message: 'Unable to save the event. Check the input and try again.',
+        });
+      }
+      setTimeout(() => setError({ isError: false, message: '' }), 5000);
+    }
   }
 
   return (
@@ -42,6 +63,7 @@ export default function EventForm({
           minLength={1}
           maxLength={50}
           aria-label="Event title"
+          defaultValue={event ? event.title : undefined}
           required
         />
       </Col>
@@ -57,6 +79,7 @@ export default function EventForm({
           aria-label="Event description"
           minLength={1}
           maxLength={500}
+          defaultValue={event ? event.description : undefined}
           required
         ></Form.Control>
       </Col>
@@ -88,6 +111,7 @@ export default function EventForm({
           id="eventDate"
           name="date"
           aria-label="Event date"
+          defaultValue={event ? event.date.slice(0, 19) : undefined}
           required
         />
       </Col>
@@ -101,6 +125,7 @@ export default function EventForm({
           minLength={1}
           maxLength={15}
           aria-label="Postcode"
+          defaultValue={event ? event.postcode : undefined}
           required
         />
       </Col>
@@ -115,6 +140,7 @@ export default function EventForm({
           minLength={1}
           maxLength={50}
           aria-label="Country"
+          defaultValue={event ? event.country : undefined}
           required
         />
       </Col>
@@ -129,6 +155,7 @@ export default function EventForm({
           minLength={1}
           maxLength={50}
           aria-label="City"
+          defaultValue={event ? event.city : undefined}
           required
         />
       </Col>
@@ -143,6 +170,7 @@ export default function EventForm({
           minLength={1}
           maxLength={50}
           aria-label="Street"
+          defaultValue={event ? event.street : undefined}
           required
         />
       </Col>
@@ -157,6 +185,7 @@ export default function EventForm({
           name="buildingNumber"
           minLength={1}
           maxLength={10}
+          defaultValue={event ? event.building_number : undefined}
           aria-label="Building number"
         />
       </Col>
@@ -170,6 +199,7 @@ export default function EventForm({
           name="buildingName"
           minLength={1}
           maxLength={50}
+          defaultValue={event ? event.building_name : undefined}
           aria-label="Building name"
         />
       </Col>
@@ -185,7 +215,7 @@ export default function EventForm({
           id="standard_quantity"
           name="standardQuantity"
           min={0}
-          defaultValue={0}
+          defaultValue={event ? event.standardTickets?.total_quantity : 0}
           aria-label="Number of standard tickets"
           required
         />
@@ -201,8 +231,8 @@ export default function EventForm({
           id="standard_price"
           name="standardPrice"
           aria-label="Standard tickets price in pounds"
-          defaultValue={0}
           min={0}
+          defaultValue={event ? event.standardTickets?.price : 0}
           required
         />
       </Col>
@@ -216,8 +246,8 @@ export default function EventForm({
           id="concession_quantity"
           name="concessionQuantity"
           aria-label="Number of concession tickets"
-          defaultValue={0}
           min={0}
+          defaultValue={event ? event.concessionTickets?.total_quantity : 0}
           required
         />
       </Col>
@@ -232,8 +262,8 @@ export default function EventForm({
           id="concession_price"
           name="concessionPrice"
           aria-label="Concession tickets price in pounds"
-          defaultValue={0}
           min={0}
+          defaultValue={event ? event.concessionTickets?.price : 0}
           required
         />
       </Col>
@@ -241,6 +271,10 @@ export default function EventForm({
       <button type="submit" className="btn btn-primary edit-btn">
         Save
       </button>
+
+      <Alert show={error.isError} variant="danger">
+        {error.message}
+      </Alert>
     </Form>
   );
 }

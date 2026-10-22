@@ -14,6 +14,7 @@ export default [
       route('dashboard', './routes/organiser/dashboard.tsx'),
       route('settings', './routes/organiser/settings.tsx'),
       route('events/new-event', './routes/organiser/newEvent.tsx'),
+      route('events/:eventId/edit', './routes/organiser/editEvent.tsx'),
     ]),
   ]),
   ...prefix('attendee', [

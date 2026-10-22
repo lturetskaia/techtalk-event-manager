@@ -69,21 +69,6 @@ export default function OrganiserEventCard({
           ) : null}
         </ListGroup>
         <div className="event-actions">
-          <NavLink
-            to={`/organiser/events/${eventItem.id}/edit`}
-            className="btn btn-primary"
-          >
-            Edit
-          </NavLink>
-          {!eventItem.is_published ? (
-            <Button
-              className="btn btn-secondary publish-btn"
-              name="publish"
-              onClick={() => handlePublishEvent(eventItem.id)}
-            >
-              Publish
-            </Button>
-          ) : null}
           {eventItem.is_published ? (
             <NavLink
               to={`/attendee/events/${eventItem.id}`}
@@ -91,7 +76,23 @@ export default function OrganiserEventCard({
             >
               View
             </NavLink>
-          ) : null}
+          ) : (
+            <>
+              <NavLink
+                to={`/organiser/events/${eventItem.id}/edit`}
+                className="btn btn-primary"
+              >
+                Edit
+              </NavLink>
+              <Button
+                className="btn btn-secondary publish-btn"
+                name="publish"
+                onClick={() => handlePublishEvent(eventItem.id)}
+              >
+                Publish
+              </Button>
+            </>
+          )}
           <Button
             className="btn btn-danger delete-btn"
             onClick={() => handleDeleteEvent(eventItem.id)}

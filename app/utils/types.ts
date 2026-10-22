@@ -16,6 +16,26 @@ export interface OrganiserEventData extends EventData {
   standardTickets: TicketData | null;
 }
 
+export interface OrganiserRawEventData {
+  id: number;
+  title: string;
+  image_path: string;
+  date: string;
+  description: string;
+  postcode: string;
+  country: string;
+  city: string;
+  street: string;
+  building_number: string;
+  building_name: string;
+  is_published: boolean;
+  publish_date: string;
+  create_date: string;
+  modified_date: string;
+  concessionTickets: TicketData | null;
+  standardTickets: TicketData | null;
+}
+
 export interface TicketData {
   id: string;
   event_id: string;
