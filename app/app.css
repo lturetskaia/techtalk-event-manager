@@ -350,6 +350,10 @@ footer p {
 #event-image {
   margin-bottom: 3rem;
 }
+.event-date {
+  text-align: center;
+  font-style: italic;
+}
 
 #img-preview {
   margin-top: 1rem;

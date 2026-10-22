@@ -27,8 +27,9 @@ export default function EditEvent({
   const navigate = useNavigate();
   async function handleSaveEvent(formData: FormData) {
     try {
+      console.log(Object.fromEntries(formData));
       const response = await postMultipartData(
-        '/organiser/events/eventId',
+        `/organiser/events/${loaderData.id}/edit`,
         formData,
       );
       navigate('/organiser/dashboard');
@@ -44,6 +45,12 @@ export default function EditEvent({
       </NavLink>
 
       <h2>{loaderData.title}</h2>
+      <p className="event-date">
+        <b>Created:</b> {loaderData.create_date}
+      </p>
+      <p className="event-date">
+        <b>Last modified:</b> {loaderData.modified_date}
+      </p>
 
       <div className="card-container">
         <EventForm handleSaveEvent={handleSaveEvent} eventData={loaderData} />
