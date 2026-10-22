@@ -94,13 +94,11 @@ export default function BookingForm({
     const inputEl = event.target;
 
     if (inputEl.id === 'standard') {
-      console.log('Increase standard');
       setTicketsChosen((prev) => ({
         ...prev,
         standard: Number(inputEl.value),
       }));
     } else {
-      console.log('Increase concession');
       setTicketsChosen((prev) => ({
         ...prev,
         concession: Number(inputEl.value),

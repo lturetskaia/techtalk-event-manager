@@ -46,7 +46,7 @@ router.get('/events', async (req, res, next) => {
   }
 });
 
-// SINGLE EVENT PAGE (ATTENDEE EVENT)
+// GET: SINGLE EVENT PAGE (ATTENDEE EVENT)
 router.get(
   '/events/:id',
   async (req: Request, res: Response, next: NextFunction) => {
@@ -224,7 +224,6 @@ router.post(
     } catch (err) {
       // Roll back any changes made if there is an error
       await connection.query('ROLLBACK');
-      console.log(err);
       return next({
         status: 500,
         message:
@@ -236,6 +235,7 @@ router.post(
   },
 );
 
+// GET: USER BOOKINGS
 router.get(
   '/my-bookings',
   requireAuth,
@@ -250,7 +250,6 @@ router.get(
         userTicketsQuery,
         [userId],
       );
-      console.log(userTicketsData);
 
       // format date to Apr 29, 2027, 12:00 AM
       userTicketsData.forEach((ticket) => {
@@ -267,6 +266,7 @@ router.get(
   },
 );
 
+// GET: USER PROFILE
 router.get(
   '/profile',
   requireAuth,
@@ -295,7 +295,7 @@ router.get(
   },
 );
 
-// POST EDIT PROFILE INFORMATION
+// POST: EDIT PROFILE INFORMATION
 router.post(
   '/profile',
   requireAuth,

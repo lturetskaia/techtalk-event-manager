@@ -1,7 +1,6 @@
 import type { Route } from './+types/event';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import EventDetails from './../components/eventDetails';
-import type { EventData, OrganiserData } from '../../utils/types';
 import BookingForm from '../components/bookingForm';
 import { get } from './../../utils/http';
 

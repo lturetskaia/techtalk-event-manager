@@ -12,7 +12,6 @@ export default [
     route('login', './routes/organiser/login.tsx'),
     layout('./routes/organiser/organiserNav.tsx', [
       route('dashboard', './routes/organiser/dashboard.tsx'),
-      route('settings', './routes/organiser/settings.tsx'),
       route('events/new-event', './routes/organiser/newEvent.tsx'),
       route('events/:eventId/edit', './routes/organiser/editEvent.tsx'),
     ]),

@@ -1,24 +1,23 @@
-import { Outlet } from 'react-router';
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
+import { Alert, Navbar, Container, Nav } from 'react-bootstrap';
 import { useNavigate, NavLink } from 'react-router';
 import { useAuth } from '~/utils/AuthContext';
+import { useState } from 'react';
+import { Outlet } from 'react-router';
 
 export default function AttendeeMenu() {
   const { user, logout } = useAuth();
+  const [logoutAlert, setLogoutAlert] = useState('');
   const navigate = useNavigate();
 
   async function handleLogout(event: React.MouseEvent) {
     event.preventDefault();
-    console.log('Logout clicked');
 
     try {
       const result = await logout();
-      console.log(result);
       navigate('/attendee/events');
     } catch (err) {
-      console.log(err);
+      setLogoutAlert('Failed to log out.');
+      setTimeout(() => setLogoutAlert(''), 5000);
     }
   }
 
@@ -64,6 +63,13 @@ export default function AttendeeMenu() {
         </Container>
       </Navbar>
       <Outlet />
+      <Alert
+        show={logoutAlert !== ''}
+        className="pop-up-alert"
+        variant="danger"
+      >
+        {logoutAlert}
+      </Alert>
     </>
   );
 }

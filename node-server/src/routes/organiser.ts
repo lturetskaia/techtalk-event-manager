@@ -26,7 +26,7 @@ import { format, formatISO } from 'date-fns';
 
 const router = express.Router();
 
-//ORGANISER HOME PAGE - DISPLAY ALL EVENTS
+//GET: ORGANISER HOME PAGE - ALL EVENTS
 router.get(
   '/dashboard',
   requireAuth,
@@ -67,7 +67,7 @@ router.get(
   },
 );
 
-//CHANGE EVENT TO PUBLISHED  (is_published property of an event to true)
+// POST: CHANGE EVENT TO PUBLISHED  (is_published property of an event to true)
 router.post(
   '/events/:id/publish',
   requireAuth,
@@ -139,7 +139,6 @@ router.delete(
         .status(200)
         .json({ message: 'The event was successfully deleted' });
     } catch (error) {
-      console.log(error);
       await connection.query('ROLLBACK'); // rollback if there was an error
       res
         .status(400)
@@ -148,7 +147,7 @@ router.delete(
   },
 );
 
-// CREATE A NEW EVENT
+// POST: CREATE A NEW EVENT
 router.post(
   '/events/new-event',
   requireAuth,
@@ -245,7 +244,6 @@ router.post(
 
       res.json({ message: 'The new event has been created' });
     } catch (err) {
-      console.log(err);
       await connection.query('ROLLBACK');
 
       const path = './public/images/' + imagePath;
@@ -264,7 +262,7 @@ router.post(
   },
 );
 
-//GET EVENT DATA BY ID
+//GET: EVENT DATA BY ID
 router.get(
   '/events/:id',
   requireAuth,
@@ -330,7 +328,7 @@ router.get(
   },
 );
 
-// EDIT AN EXISTING DRAFT EVENT
+// POST: EDIT AN EXISTING DRAFT EVENT
 router.post(
   '/events/:id/edit',
   requireAuth,
@@ -361,7 +359,7 @@ router.post(
         eventStatusQuery,
         [eventId],
       );
-      console.log(eventStatusQueryResult[0]);
+
       const isDraftEvent =
         eventStatusQueryResult[0] &&
         eventStatusQueryResult[0].is_published == false;
@@ -447,7 +445,6 @@ router.post(
 
       res.json({ message: 'The event has been updated' });
     } catch (err) {
-      console.log(err);
       await connection.query('ROLLBACK');
       next({
         status: 500,

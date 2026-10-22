@@ -27,7 +27,6 @@ export default function EditEvent({
   const navigate = useNavigate();
   async function handleSaveEvent(formData: FormData) {
     try {
-      console.log(Object.fromEntries(formData));
       const response = await postMultipartData(
         `/organiser/events/${loaderData.id}/edit`,
         formData,

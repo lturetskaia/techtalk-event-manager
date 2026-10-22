@@ -40,8 +40,6 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
       phone: data.phone.toString() || '',
     };
 
-    console.log(userData);
-
     try {
       const response = await post(`/attendee/profile`, userData);
       //show success message

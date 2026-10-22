@@ -1,6 +1,5 @@
 import type { Route } from './+types/main';
 import BtnCard from './components/btnCard';
-import { useNavigate, NavLink } from 'react-router';
 import { useAuth } from '~/utils/AuthContext';
 
 export function meta({}: Route.MetaArgs) {

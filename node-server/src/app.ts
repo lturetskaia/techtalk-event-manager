@@ -171,10 +171,6 @@ app.post(
 
       req.session.user = userPayload;
 
-      // console.log(
-      //   `Login successful, user ID: ${req.session.user.id}, role: ${req.session.user.role}`,
-      // );
-
       return res.json({
         message: 'Login successful',
         user: userPayload,
@@ -187,7 +183,6 @@ app.post(
 
 // Error handling middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.log(err);
   const errorMessage = err.message || 'Something went wrong';
   const statusCode = err.status || 500;
   res.status(statusCode).json({ message: errorMessage });

@@ -37,7 +37,6 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
   }
 
   async function handleDeleteEvent(eventId: number) {
-    console.log(eventId);
     const path = `/organiser/events/${eventId}`;
     try {
       await deleteEventData(path);
