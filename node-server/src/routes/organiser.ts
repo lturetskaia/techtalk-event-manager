@@ -15,12 +15,14 @@ import { requireAuth, verifyRole } from '../middleware/auth.js';
 import type {
   TicketTypeData,
   OrganiserEventData,
+  OrganiserRawEventData,
   OrganiserData,
 } from '../utils/types.js';
 import { formatOrganiserEventData } from '../utils/helperFunctions.js';
 import { getCurrentDateTime } from '../utils/helperFunctions.js';
 import { upload } from '../middleware/multerUploader.js';
 import fs from 'fs';
+import { format, formatISO } from 'date-fns';
 
 const router = express.Router();
 
@@ -239,6 +241,66 @@ router.post(
         status: 500,
         message:
           'Failed to create a new event. Check the input or try again later.',
+      });
+    }
+  },
+);
+
+//GET EVENT DATA BY ID
+router.get(
+  '/events/:id',
+  requireAuth,
+  verifyRole('ORGANISER'),
+  async (req: Request, res: Response, next: NextFunction) => {
+    const eventId = req.params.id;
+
+    try {
+      // Get data from "event" by event id
+      const eventsQuery = `SELECT event.id, event.title, event.image_path, event.date, event.description, event.create_date, event.publish_date, event.is_published, event.create_date, event.publish_date, event.modified_date, 
+      location.building_name, location.building_number, location.street, 
+      location.city, location.country, location.postcode
+      FROM event 
+      JOIN location 
+      ON event.location_id=location.id
+      WHERE event.id=?`;
+      const [eventsData] = await connection.query<OrganiserRawEventData[]>(
+        eventsQuery,
+        [eventId],
+      );
+
+      // Get data from "ticketType"  by event id
+      const ticketsQuery =
+        'SELECT * FROM ticketType WHERE ticketType.event_id=?';
+      const [ticketsData] = await connection.query<TicketTypeData[]>(
+        ticketsQuery,
+        [eventId],
+      );
+      const standardTickets = ticketsData.find(
+        (ticket) => ticket.type === 'standard',
+      );
+      const concessionTickets = ticketsData.find(
+        (ticket) => ticket.type === 'concession',
+      );
+
+      //Merge events array with ticket types
+      const event = {
+        ...eventsData[0],
+        standardTickets,
+        concessionTickets,
+      };
+
+      // event.date
+      //   ? (event.date = formatISO(event.date, { format: 'basic' }))
+      //   : null; // format date to Apr 29, 2027, 12:00 AM
+
+      // event.date ? (event.date = format(new Date(event.date), 'PPp')) : null;
+
+      console.log(event);
+      res.json({ ...event });
+    } catch (err) {
+      next({
+        status: 500,
+        message: 'Failed to access event data. Please try again later.',
       });
     }
   },

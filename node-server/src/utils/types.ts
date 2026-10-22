@@ -15,6 +15,23 @@ export interface OrganiserEventData extends EventData {
   modified_date: string;
 }
 
+export interface OrganiserRawEventData extends EventData {
+  id: number;
+  title: string;
+  image_path: string;
+  date: string;
+  postcode: string;
+  country: string;
+  city: string;
+  street: string;
+  building_number: string;
+  building_name: string;
+  is_published: boolean;
+  publish_date: string;
+  create_date: string;
+  modified_date: string;
+}
+
 export interface OrganiserData extends RowDataPacket {
   id: number;
   name: string;
