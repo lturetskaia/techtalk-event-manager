@@ -24,7 +24,7 @@ export default function SignupForm() {
       email: data.email.toString(),
       password: data.password.toString(),
       first_name: data.firstName.toString(),
-      last_name: data.firstName.toString(),
+      last_name: data.lastName.toString(),
       phone: data.phone.toString(),
     };
 
