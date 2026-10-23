@@ -19,7 +19,7 @@ import { validationResult } from 'express-validator';
 
 //bcrypt for password hashing
 import bcrypt from 'bcrypt';
-const saltRounds = 10;
+export const saltRounds = 10;
 
 enum UserRoles {
   ATTENDEE = 'ATTENDEE',
@@ -124,9 +124,16 @@ app.post(
     //validate login data
     if (!errors.isEmpty()) {
       // If there are any errors, pass the error to error handling middleware
+
+      let errorMsg = '';
+      for (let e of errors.array()) {
+        errorMsg += e.msg;
+      }
+
       return next({
         status: 400,
         message:
+          errorMsg ||
           'Bad input! Please check your login information and try again.',
       });
     }

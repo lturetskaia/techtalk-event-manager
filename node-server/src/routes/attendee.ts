@@ -3,12 +3,13 @@ import express, {
   type Request,
   type Response,
 } from 'express';
-import type { ResultSetHeader } from 'mysql2';
+import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { connection } from './../app.js';
 import { format } from 'date-fns';
 import {
   validateBooking,
   validateUser,
+  validateLogin,
 } from './../middleware/dataValidator.js';
 import { validationResult } from 'express-validator';
 import { requireAuth, verifyRole } from '../middleware/auth.js';
@@ -19,6 +20,8 @@ import type {
   UserDetails,
   UserTicketData,
 } from '../utils/types.js';
+import bcrypt from 'bcrypt';
+import { saltRounds } from './../app.js';
 
 const router = express.Router();
 
@@ -104,9 +107,15 @@ router.post(
 
     if (!errors.isEmpty()) {
       // If there are any errors, pass the error to error handling middleware
+      let errorMsg = '';
+      for (let e of errors.array()) {
+        errorMsg += e.msg;
+      }
+
       const err = {
         status: 400,
         message:
+          errorMsg ||
           'Bad input! Please check your booking information and try again.',
       };
       return next(err);
@@ -309,9 +318,15 @@ router.post(
     //validate login data
     if (!errors.isEmpty()) {
       // If there are any errors, pass the error to error handling middleware
+      let errorMsg = '';
+      for (let e of errors.array()) {
+        errorMsg += e.msg;
+      }
       return next({
         status: 400,
-        message: 'Bad input! Please check your profile details and try again.',
+        message:
+          errorMsg ||
+          'Bad input! Please check your profile details and try again.',
       });
     }
 
@@ -332,6 +347,71 @@ router.post(
       next({
         status: 500,
         message: 'Failed to update profile details',
+      });
+    }
+  },
+);
+
+router.post(
+  '/signup',
+  validateUser,
+  validateLogin,
+  async (req: Request, res: Response, next: NextFunction) => {
+    // Get errors from validation
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      // If there are any errors, pass the error to error handling middleware
+      let errorMsg = '';
+      for (let e of errors.array()) {
+        errorMsg += e.msg + '\n';
+      }
+
+      const err = {
+        status: 400,
+        message:
+          errorMsg ||
+          'Bad input! Please check your booking information and try again.',
+      };
+      return next(err);
+    }
+
+    const userData = req.body;
+
+    try {
+      //check if a user with this email has already been registered
+      const userQuery = 'SELECT user.id FROM user WHERE user.email=?';
+      const [users] = await connection.query<RowDataPacket[]>(userQuery, [
+        userData.email,
+      ]);
+
+      if (users.length !== 0) {
+        return next({
+          status: 409,
+          message: 'A user with these credentials has already been registered.',
+        });
+      }
+
+      const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
+      const isAdmin = false;
+
+      // Add new user to the user table
+      const newUserInsert =
+        'INSERT INTO user (email, first_name, last_name, phone, password_hash, is_organiser) VALUES (?,?,?,?,?,?)';
+      await connection.query(newUserInsert, [
+        userData.email,
+        userData.first_name,
+        userData.last_name,
+        userData.phone,
+        hashedPassword,
+        isAdmin,
+      ]);
+
+      res.json({ message: 'New uesr registration completed.' });
+    } catch (err) {
+      return next({
+        status: 500,
+        message: 'Failed to save new user.',
       });
     }
   },

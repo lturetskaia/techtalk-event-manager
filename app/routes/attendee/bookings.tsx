@@ -1,6 +1,6 @@
 import type { Route } from './+types/bookings';
 import { useState } from 'react';
-import { get } from './../../utils/http';
+import { getData } from './../../utils/http';
 import type { UserTicketData } from './../../utils/types';
 import { NavLink } from 'react-router';
 import TicketCard from '../components/ticketCard';
@@ -13,7 +13,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export async function clientLoader() {
-  const bookingData = await get('/attendee/my-bookings');
+  const bookingData = await getData('/attendee/my-bookings');
   return bookingData.userTicketsData;
 }
 

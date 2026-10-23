@@ -2,7 +2,7 @@ import type { Route } from './+types/event';
 import { useState } from 'react';
 import EventDetails from './../components/eventDetails';
 import BookingForm from '../components/bookingForm';
-import { get } from './../../utils/http';
+import { getData } from './../../utils/http';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -12,7 +12,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-  const eventData = await get(`/attendee/events/${params.eventId}`);
+  const eventData = await getData(`/attendee/events/${params.eventId}`);
   return eventData;
 }
 

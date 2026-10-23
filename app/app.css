@@ -318,6 +318,8 @@ footer p {
 
 .alert-danger {
   font-size: 1rem;
+  white-space: pre-wrap;
+  text-align: left;
 }
 
 #qr-image {

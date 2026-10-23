@@ -3,7 +3,7 @@ import { NavLink } from 'react-router';
 import { Card, ListGroup, Tab, Tabs } from 'react-bootstrap';
 import { useState } from 'react';
 import OrganiserEventCard from '../components/organiserEventCard';
-import { get, post, deleteEventData } from './../../utils/http';
+import { getData, postData, deleteEventData } from './../../utils/http';
 import type { OrganiserData, OrganiserEventData } from '~/utils/types';
 
 export function meta({}: Route.MetaArgs) {
@@ -14,7 +14,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export async function clientLoader() {
-  const data = await get('/organiser/dashboard');
+  const data = await getData('/organiser/dashboard');
   return data;
 }
 
@@ -28,7 +28,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
   async function handlePublishEvent(eventId: number) {
     const path = `/organiser/events/${eventId}/publish`;
     try {
-      await post(path);
+      await postData(path);
       const newData = await clientLoader();
       setEvents(newData.events);
     } catch (e) {

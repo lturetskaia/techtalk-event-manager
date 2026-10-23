@@ -174,10 +174,15 @@ router.post(
       if (fs.existsSync(path) && imagePath !== 'default_img.png') {
         fs.rmSync(path);
       }
+      let errorMsg = '';
+      for (let e of errors.array()) {
+        errorMsg += e.msg;
+      }
 
       return next({
         status: 400,
         message:
+          errorMsg ||
           'Bad input! Please check the entered event information and try again.',
       });
     }
@@ -341,9 +346,15 @@ router.post(
     const errors = validationResult(req); // data validation result
 
     if (!errors.isEmpty()) {
+      let errorMsg = '';
+      for (let e of errors.array()) {
+        errorMsg += e.msg;
+      }
+
       next({
         status: 400,
         message:
+          errorMsg ||
           'Bad input! Please check the entered event information and try again.',
       });
     }

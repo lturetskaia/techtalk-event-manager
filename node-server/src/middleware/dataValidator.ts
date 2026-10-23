@@ -10,28 +10,28 @@ const validateBooking = [
     .notEmpty()
     .withMessage('Id is required')
     .isInt({ min: 1 })
-    .withMessage('Event ID must be an integer >= 1')
+    .withMessage('Event ID must be an integer >= 1.')
     .toInt(),
 
   body('standard')
     .trim()
     .default(0)
     .isInt({ min: 0 })
-    .withMessage('Standard tickets amount must not be negative')
+    .withMessage('Standard tickets amount must not be negative.')
     .toInt(),
 
   body('concession')
     .trim()
     .default(0)
     .isInt({ min: 0 })
-    .withMessage('Concession tickets amount must not be negative')
+    .withMessage('Concession tickets amount must not be negative.')
     .toInt(),
 
   // Check if at least one ticket is being purchased
   body().custom((body) => {
     if (body.standard == 0 && body.concession == 0) {
       throw new Error(
-        'You must purchase at least one standard or concession ticket',
+        'You must purchase at least one standard or concession ticket.',
       );
     }
     return true;
@@ -44,38 +44,39 @@ const validateUser = [
   body('first_name')
     .trim()
     .notEmpty()
-    .withMessage('First name must be between 2 and 50 characters')
+    .withMessage('First name must not be empty.')
     .isLength({ min: 1, max: 50 })
+    .withMessage('First name must be between 2 and 50 characters.')
     .matches(/^[A-Za-z\s-]+$/)
-    .withMessage('First name can only contain letters, spaces and hyphens'),
+    .withMessage('First name can only contain letters, spaces and hyphens.'),
 
   body('last_name')
     .trim()
     .notEmpty()
-    .withMessage('Last name is required')
+    .withMessage('Last name is required.')
     .isLength({ min: 1, max: 50 })
-    .withMessage('Last name must be between 2 and 50 characters')
+    .withMessage('Last name must be between 2 and 50 characters.')
     .matches(/^[A-Za-z\s-]+$/)
-    .withMessage('Last name can only contain letters, spaces and hyphens'),
+    .withMessage('Last name can only contain letters, spaces and hyphens.'),
 
   body('email')
     .trim()
     .notEmpty()
-    .withMessage('Email is required')
+    .withMessage('Email is required.')
     .isLength({ min: 4, max: 254 })
-    .withMessage('Phone number must be between 4 and 254 characters')
+    .withMessage('Phone number must be between 4 and 254 characters.')
     .isEmail()
-    .withMessage('Please enter a valid email address')
+    .withMessage('Please enter a valid email address.')
     .normalizeEmail(),
 
   body('phone')
     .trim()
     .notEmpty()
-    .withMessage('Phone number is required')
+    .withMessage('Phone number is required.')
     .isLength({ min: 4, max: 50 })
-    .withMessage('Phone number must be between 4 and 50 characters')
+    .withMessage('Phone number must be between 4 and 50 characters.')
     .isMobilePhone('any')
-    .withMessage('Please enter a valid phone number'),
+    .withMessage('Please enter a valid phone number.'),
 ];
 
 //User validation chain
@@ -93,9 +94,9 @@ const validateLogin = [
     .notEmpty()
     .withMessage('Email is required')
     .isLength({ min: 4, max: 254 })
-    .withMessage('Phone number must be between 4 and 254 characters')
+    .withMessage('Phone number must be between 4 and 254 characters.')
     .isEmail()
-    .withMessage('Please enter a valid email address')
+    .withMessage('Please enter a valid email address.')
     .normalizeEmail(),
 ];
 
@@ -103,9 +104,9 @@ const validateLogin = [
 const validateEvent = [
   body('date')
     .exists({ checkFalsy: true })
-    .withMessage('Event date is required')
+    .withMessage('Event date is required.')
     .isISO8601()
-    .withMessage('Date must be a valid ISO8601 date format')
+    .withMessage('Date must be a valid ISO8601 date format.')
     .toDate(), // Sanitizes the input into a JavaScript Date object
 
   body('title')
@@ -113,15 +114,15 @@ const validateEvent = [
     .notEmpty()
     .withMessage('Title is required')
     .isLength({ max: 50 })
-    .withMessage('Title cannot exceed 50 characters')
+    .withMessage('Title cannot exceed 50 characters.')
     .escape(), // Prevents basic XSS injections
 
   body('description')
     .trim()
     .notEmpty()
-    .withMessage('Description is required')
+    .withMessage('Description is required.')
     .isLength({ max: 500 })
-    .withMessage('Description cannot exceed 500 characters')
+    .withMessage('Description cannot exceed 500 characters.')
     .escape(),
 ];
 
@@ -130,14 +131,14 @@ const validateTicketType = [
     .exists()
     .withMessage('Price is required')
     .isFloat({ min: 0.0, max: 999.99 }) //sql type DECIMAL(5,2)
-    .withMessage('Price must be a positive number between 0.00 and 99.99')
+    .withMessage('Price must be a positive number between 0.00 and 99.99.')
     // convert string input to a float with 2 decimal places
     .customSanitizer((val) => parseFloat(parseFloat(val).toFixed(2))),
 
   body(['standardQuantity', 'concessionQuantity'])
     .optional({ values: 'null' }) // Allows null or empty fields
     .isInt({ min: 0, max: 32767 })
-    .withMessage('Total quantity must be a positive whole number up to 32,767')
+    .withMessage('Total quantity must be a positive whole number up to 32,767.')
     .toInt(),
 ];
 
@@ -145,51 +146,51 @@ const validateLocation = [
   body('country')
     .trim()
     .notEmpty()
-    .withMessage('Country is required')
+    .withMessage('Country is required.')
     .isLength({ max: 50 })
-    .withMessage('Country cannot exceed 50 characters')
+    .withMessage('Country cannot exceed 50 characters.')
     .escape(),
 
   body('city')
     .trim()
     .notEmpty()
-    .withMessage('City is required')
+    .withMessage('City is required.')
     .isLength({ max: 50 })
-    .withMessage('City cannot exceed 50 characters')
+    .withMessage('City cannot exceed 50 characters.')
     .escape(),
 
   body('street')
     .trim()
     .notEmpty()
-    .withMessage('Street is required')
+    .withMessage('Street is required.')
     .isLength({ max: 50 })
-    .withMessage('Street cannot exceed 50 characters')
+    .withMessage('Street cannot exceed 50 characters.')
     .escape(),
 
   body('building_number')
     .optional({ values: 'null' }) // Allows null or empty inputs
     .trim()
     .isLength({ max: 10 })
-    .withMessage('Building number cannot exceed 10 characters')
+    .withMessage('Building number cannot exceed 10 characters.')
     .escape(),
 
   body('building_name')
     .optional({ values: 'null' })
     .trim()
     .isLength({ max: 50 })
-    .withMessage('Building name cannot exceed 50 characters')
+    .withMessage('Building name cannot exceed 50 characters.')
     .escape(),
 
   body('postcode')
     .trim()
     .notEmpty()
-    .withMessage('Postcode is required')
+    .withMessage('Postcode is required.')
     .isLength({ min: 2, max: 15 })
-    .withMessage('Postcode must be between 2 and 15 characters')
+    .withMessage('Postcode must be between 2 and 15 characters.')
     // alphanumeric/space validation
     .matches(/^[A-Za-z0-9\s-]+$/)
     .withMessage(
-      'Postcode can only contain letters, numbers, spaces, and hyphens',
+      'Postcode can only contain letters, numbers, spaces, and hyphens.',
     )
     // convert the input to uppercase
     .customSanitizer((val) => val.toUpperCase()),
@@ -200,17 +201,17 @@ const validateSiteSettings = [
   body('organiserName')
     .trim()
     .notEmpty()
-    .withMessage('Title is required')
+    .withMessage('Title is required.')
     .isLength({ max: 50 })
-    .withMessage('Site name cannot exceed 50 characters')
+    .withMessage('Site name cannot exceed 50 characters.')
     .escape(), // Prevents basic XSS injections
 
   body('organiserDescription')
     .trim()
     .notEmpty()
-    .withMessage('Description is required')
+    .withMessage('Description is required.')
     .isLength({ max: 500 })
-    .withMessage('Site description cannot exceed 500 characters')
+    .withMessage('Site description cannot exceed 500 characters.')
     .escape(),
 ];
 
