@@ -70,6 +70,7 @@ export default function BookingForm({
         isError: false,
       });
       event.target.reset();
+      setTicketsChosen({ standard: 0, concession: 0 });
     } catch (err: any) {
       //show success message
       setBookingMessage({
@@ -213,8 +214,12 @@ export default function BookingForm({
                   <td>
                     &pound;{' '}
                     {ticket.type === 'standard'
-                      ? ticketsChosen.standard * Number(ticket.price)
-                      : ticketsChosen.concession * Number(ticket.price)}{' '}
+                      ? (ticketsChosen.standard * Number(ticket.price)).toFixed(
+                          2,
+                        )
+                      : (
+                          ticketsChosen.concession * Number(ticket.price)
+                        ).toFixed(2)}
                   </td>
                 </tr>
               );
@@ -226,7 +231,7 @@ export default function BookingForm({
       <div>
         <div className="total-price-container">
           <p id="total-price">
-            TOTAL: <span> &pound; {totalPrice}</span>
+            TOTAL: <span> &pound; {totalPrice.toFixed(2)}</span>
           </p>
         </div>
         <div className="book-btn-container">
