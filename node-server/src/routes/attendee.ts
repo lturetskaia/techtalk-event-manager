@@ -104,9 +104,15 @@ router.post(
 
     if (!errors.isEmpty()) {
       // If there are any errors, pass the error to error handling middleware
+      let errorMsg = '';
+      for (let e of errors.array()) {
+        errorMsg += e.msg;
+      }
+
       const err = {
         status: 400,
         message:
+          errorMsg ||
           'Bad input! Please check your booking information and try again.',
       };
       return next(err);
@@ -309,9 +315,15 @@ router.post(
     //validate login data
     if (!errors.isEmpty()) {
       // If there are any errors, pass the error to error handling middleware
+      let errorMsg = '';
+      for (let e of errors.array()) {
+        errorMsg += e.msg;
+      }
       return next({
         status: 400,
-        message: 'Bad input! Please check your profile details and try again.',
+        message:
+          errorMsg ||
+          'Bad input! Please check your profile details and try again.',
       });
     }
 
