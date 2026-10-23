@@ -5,7 +5,7 @@ import Table from 'react-bootstrap/Table';
 import Alert from 'react-bootstrap/Alert';
 import { useState } from 'react';
 import type { TicketData, UserDetails, BookingData } from '~/utils/types';
-import { post } from '~/utils/http';
+import { postData } from '~/utils/http';
 
 export default function BookingForm({
   tickets,
@@ -58,7 +58,7 @@ export default function BookingForm({
     };
 
     try {
-      const response = await post(
+      const response = await postData(
         `/attendee/events/${eventId}/book`,
         bookingData,
       );

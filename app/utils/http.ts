@@ -1,6 +1,6 @@
 import type { BookingData, LoginData, UserDetails } from './types';
 
-async function get(path: string) {
+async function getData(path: string) {
   const url = `http://localhost:3000${path}`;
   const response = await fetch(url, {
     method: 'GET',
@@ -19,7 +19,7 @@ async function get(path: string) {
   return responseData;
 }
 
-async function post(
+async function postData(
   path: string,
   data: LoginData | BookingData | UserDetails | undefined = undefined,
 ) {
@@ -78,4 +78,4 @@ async function deleteEventData(path: string) {
   return responseData;
 }
 
-export { get, post, deleteEventData, postMultipartData };
+export { getData, postData, deleteEventData, postMultipartData };

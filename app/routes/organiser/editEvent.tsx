@@ -2,7 +2,7 @@ import type { Route } from './+types/editEvent';
 import { NavLink } from 'react-router';
 import { useNavigate } from 'react-router';
 import EventForm from '../components/eventForm';
-import { postMultipartData, get } from '~/utils/http';
+import { postMultipartData, getData } from '~/utils/http';
 import type { OrganiserRawEventData } from '../../utils/types';
 
 export function meta({}: Route.MetaArgs) {
@@ -13,7 +13,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-  const eventData: OrganiserRawEventData = await get(
+  const eventData: OrganiserRawEventData = await getData(
     `/organiser/events/${params.eventId}`,
   );
   return eventData;

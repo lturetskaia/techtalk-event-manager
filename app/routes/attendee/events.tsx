@@ -1,6 +1,6 @@
 import type { Route } from './+types/events';
 import EventCard from '../components/eventCard';
-import { get } from '~/utils/http';
+import { getData } from '~/utils/http';
 import { useState, useEffect } from 'react';
 import type { EventData, OrganiserData } from '../../utils/types';
 
@@ -26,7 +26,7 @@ export default function Events() {
     //fetch events
     async function startFetching() {
       try {
-        const fetchedData = await get('/attendee/events');
+        const fetchedData = await getData('/attendee/events');
         setEventsData(fetchedData);
       } catch (err) {
         setIsError(true);

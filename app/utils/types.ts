@@ -73,6 +73,14 @@ export interface LoginData {
   password: string;
 }
 
+export interface SignupData {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+}
+
 export interface UserLoginData {
   id: number;
   role: 'ATTENDEE' | 'ORGANISER';

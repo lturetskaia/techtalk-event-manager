@@ -1,11 +1,11 @@
 import type { Route } from './+types/profile';
 import { Card, ListGroup } from 'react-bootstrap';
-import { get } from './../../utils/http';
+import { getData } from './../../utils/http';
 import { useState } from 'react';
 import type { UserDetails } from '~/utils/types';
 import UserDetailsForm from '../components/userDetailsForm';
 import { Alert } from 'react-bootstrap';
-import { post } from '~/utils/http';
+import { postData } from '~/utils/http';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -14,7 +14,7 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 export async function clientLoader() {
-  const profileData = await get('/attendee/profile');
+  const profileData = await getData('/attendee/profile');
   return profileData;
 }
 
@@ -41,7 +41,7 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
     };
 
     try {
-      const response = await post(`/attendee/profile`, userData);
+      const response = await postData(`/attendee/profile`, userData);
       //show success message
       setUpdatingMessage({
         active: true,

@@ -6,7 +6,7 @@ import {
   useContext,
   type ReactNode,
 } from 'react';
-import { get, post } from './http';
+import { getData, postData } from './http';
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Check active session status when the app loads
   useEffect(() => {
     async function getInitialLoginState() {
-      await get('/api/me')
+      await getData('/api/me')
         .then((res) => setUser(res.user))
         .catch(() => setUser(null))
         .finally(() => setIsLoading(false));
@@ -26,13 +26,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (loginData: LoginData) => {
-    const res = await post('/login', loginData);
+    const res = await postData('/login', loginData);
     setUser(res.user);
     return res.user; //return the new user login data
   };
 
   const logout = async () => {
-    const res = await post('/logout');
+    const res = await postData('/logout');
     setUser(null);
     return res;
   };
