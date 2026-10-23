@@ -1,4 +1,4 @@
-import type { BookingData, LoginData, UserDetails } from './types';
+import type { BookingData, LoginData, UserDetails, SignupData } from './types';
 
 async function getData(path: string) {
   const url = `http://localhost:3000${path}`;
@@ -21,7 +21,8 @@ async function getData(path: string) {
 
 async function postData(
   path: string,
-  data: LoginData | BookingData | UserDetails | undefined = undefined,
+  data:
+    LoginData | BookingData | UserDetails | SignupData | undefined = undefined,
 ) {
   const url = `http://localhost:3000${path}`;
   const response = await fetch(url, {

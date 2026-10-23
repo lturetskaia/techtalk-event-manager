@@ -19,7 +19,7 @@ import { validationResult } from 'express-validator';
 
 //bcrypt for password hashing
 import bcrypt from 'bcrypt';
-const saltRounds = 10;
+export const saltRounds = 10;
 
 enum UserRoles {
   ATTENDEE = 'ATTENDEE',

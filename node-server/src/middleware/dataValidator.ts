@@ -44,8 +44,9 @@ const validateUser = [
   body('first_name')
     .trim()
     .notEmpty()
-    .withMessage('First name must be between 2 and 50 characters.')
+    .withMessage('First name must not be empty.')
     .isLength({ min: 1, max: 50 })
+    .withMessage('First name must be between 2 and 50 characters.')
     .matches(/^[A-Za-z\s-]+$/)
     .withMessage('First name can only contain letters, spaces and hyphens.'),
 

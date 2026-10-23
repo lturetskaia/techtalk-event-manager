@@ -23,13 +23,13 @@ export default function SignupForm() {
     const signupData: SignupData = {
       email: data.email.toString(),
       password: data.password.toString(),
-      firstName: data.firstName.toString(),
-      lastName: data.firstName.toString(),
+      first_name: data.firstName.toString(),
+      last_name: data.firstName.toString(),
       phone: data.phone.toString(),
     };
 
     try {
-      const loggedInUser = await postData('/attendee/signup', signupData);
+      await postData('/attendee/signup', signupData);
       navigate('/attendee/login');
     } catch (err: any) {
       //show error message
