@@ -39,7 +39,9 @@ export default function LoginForm() {
       //show error message
       setLoginError({
         isError: true,
-        message: 'The user with these credentials has not been found!',
+        message:
+          err.message ||
+          'Something went wrong. Please, check the user name and password and try again.',
       });
     }
   }
