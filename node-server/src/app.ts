@@ -33,7 +33,7 @@ interface LoginData extends RowDataPacket {
 }
 
 const app = express();
-const port = 3000;
+const port = 3001;
 
 // DB connection
 const connection = await mysql.createPool({
@@ -80,16 +80,16 @@ app.use(
 
 app.use(
   cors({
-    origin: 'http://localhost:5173', // Your React app URL (Do NOT use '*')
+    origin: 'http://localhost:5173',
     credentials: true, // Allows browser to exchange cookies cross-origin
   }),
 );
 app.use(express.json()); //use bodyparser
-app.use(express.static(path.resolve() + '/public')); // set location of static files
-app.use('/attendee', attendeeRoutes);
-app.use('/organiser', organiserRoutes);
+app.use('/api', express.static(path.join(path.resolve(), 'public'))); // set location of static files
+app.use('api/attendee', attendeeRoutes);
+app.use('api/organiser', organiserRoutes);
 
-app.post('/logout', (req, res, next) => {
+app.post('/api/logout', (req, res, next) => {
   if (req.session) {
     // Destroy the session
     req.session.destroy((err) => {
@@ -115,7 +115,7 @@ app.get('/api/me', (req: Request, res: Response) => {
 
 // POST: login requests for all users
 app.post(
-  '/login',
+  '/api/login',
   validateLogin,
   async (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);

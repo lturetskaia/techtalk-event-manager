@@ -8,8 +8,8 @@ import {
 } from 'react-router';
 
 import type { Route } from './+types/root';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './app.css';
+import bootstrapStyles from 'bootstrap/dist/css/bootstrap.min.css?url';
+import appStyles from './app.css?url';
 import { AuthProvider } from './utils/AuthContext';
 
 export const links: Route.LinksFunction = () => [
@@ -23,6 +23,9 @@ export const links: Route.LinksFunction = () => [
     rel: 'stylesheet',
     href: 'https://fonts.googleapis.com/css2?family=Tektur:wght@400..900&display=swap',
   },
+  { rel: 'stylesheet', href: bootstrapStyles },
+  { rel: 'stylesheet', href: appStyles },
+  { rel: 'icon', href: '/favicon.ico', type: 'image/ico' },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -40,7 +43,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <ScrollRestoration />
           <Scripts />
           <footer>
-            <p>© 2026 TechTalk</p>
+            <p>Created by Larisa Turetskaia</p>
           </footer>
         </body>
       </AuthProvider>

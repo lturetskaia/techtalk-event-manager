@@ -16,7 +16,7 @@ export default function AttendeeSignup() {
         <SignupForm />
 
         <p id="auth-option-info">
-          Already registered? <a href="/attendee/login">Log in</a>
+          Already registered? <a href="/event-manager/attendee/login">Log in</a>
         </p>
       </div>
     </main>

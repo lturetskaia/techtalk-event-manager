@@ -11,8 +11,8 @@ export default function OrganiserEventCard({
   handlePublishEvent: (eventId: number) => void;
   handleDeleteEvent: (eventId: number) => void;
 }) {
-  const eventPath = '/attendee/events/' + eventItem.id;
-  const imageURL = 'http://localhost:3000/images/' + eventItem.image_path;
+  const imageURL =
+    import.meta.env.VITE_API_URL + '/images/' + eventItem.image_path;
 
   return (
     <Card className="card" id="event-card">

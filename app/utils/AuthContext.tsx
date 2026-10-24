@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Check active session status when the app loads
   useEffect(() => {
     async function getInitialLoginState() {
-      await getData('/api/me')
+      await getData('/me')
         .then((res) => setUser(res.user))
         .catch(() => setUser(null))
         .finally(() => setIsLoading(false));

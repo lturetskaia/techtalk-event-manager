@@ -25,9 +25,9 @@ export default function AttendeeMenu() {
     <>
       <Navbar variant="dark" expand="lg">
         <Container>
-          <Navbar.Brand href="/">
+          <Navbar.Brand href="/event-manager">
             <img
-              src="/logo.svg"
+              src="/api/logo.svg"
               alt=""
               width="30"
               height="24"

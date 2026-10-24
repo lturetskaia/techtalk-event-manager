@@ -9,7 +9,7 @@ export default function EventForm({
   handleSaveEvent: (formData: FormData) => Promise<void>;
   eventData: OrganiserRawEventData | null;
 }) {
-  let imgPath = 'http://localhost:3000/images/';
+  let imgPath = import.meta.env.VITE_API_URL + '/images/';
 
   if (eventData?.image_path) {
     imgPath += eventData.image_path;

@@ -1,8 +1,4 @@
-import { Button } from 'react-bootstrap';
-import Col from 'react-bootstrap/Col';
-import Form from 'react-bootstrap/Form';
-import Table from 'react-bootstrap/Table';
-import Alert from 'react-bootstrap/Alert';
+import { Button, Col, Form, Table, Alert } from 'react-bootstrap';
 import { useState } from 'react';
 import type { TicketData, UserDetails, BookingData } from '~/utils/types';
 import { postData } from '~/utils/http';
@@ -162,7 +158,7 @@ export default function BookingForm({
           type="tel"
           id="phone"
           name="phone"
-          placeholder="123-456-7890"
+          placeholder="1234567890"
           min="4"
           max="50"
           defaultValue={user ? user.phone : ''}

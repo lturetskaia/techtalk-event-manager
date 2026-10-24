@@ -29,7 +29,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
     const path = `/organiser/events/${eventId}/publish`;
     try {
       await postData(path);
-      const newData = await clientLoader();
+      const newData = await getData('/organiser/dashboard');
       setEvents(newData.events);
     } catch (e) {
       //error message
@@ -40,7 +40,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
     const path = `/organiser/events/${eventId}`;
     try {
       await deleteEventData(path);
-      const newData = await clientLoader();
+      const newData = await getData('/organiser/dashboard');
       setEvents(newData.events);
     } catch (e) {
       //error message

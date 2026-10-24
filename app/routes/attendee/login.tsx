@@ -15,7 +15,8 @@ export default function AttendeeLogin() {
         <h1>User Login</h1>
         <LoginForm />
         <p id="auth-option-info">
-          Not registered? <a href="/attendee/signup">Create an account</a>
+          Not registered?{' '}
+          <a href="/event-manager/attendee/signup">Create an account</a>
         </p>
       </div>
     </main>

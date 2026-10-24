@@ -1,6 +1,5 @@
 import { Outlet, useNavigate, NavLink } from 'react-router';
-import Container from 'react-bootstrap/Container';
-import { Nav, Navbar, Alert } from 'react-bootstrap';
+import { Nav, Navbar, Alert, Container } from 'react-bootstrap';
 import { useAuth } from '~/utils/AuthContext';
 import { useState } from 'react';
 
@@ -25,9 +24,9 @@ export default function OrganiserMenu() {
     <>
       <Navbar variant="dark" expand="lg">
         <Container>
-          <Navbar.Brand href="/">
+          <Navbar.Brand href="/event-manager">
             <img
-              src="/logo.svg"
+              src="/api/logo.svg"
               alt=""
               width="30"
               height="24"

@@ -1,5 +1,4 @@
-import Card from 'react-bootstrap/Card';
-import { ListGroup } from 'react-bootstrap';
+import { ListGroup, Card } from 'react-bootstrap';
 import { NavLink } from 'react-router';
 import { Button } from 'react-bootstrap';
 import type { EventData, TicketData } from '~/utils/types';
@@ -11,7 +10,7 @@ export default function EventDetails({
   event: EventData;
   tickets: TicketData[];
 }) {
-  const imageURL = 'http://localhost:3000/images/' + event.image_path;
+  const imageURL = import.meta.env.VITE_API_URL + '/images/' + event.image_path;
 
   return (
     <Card className="card event-details">

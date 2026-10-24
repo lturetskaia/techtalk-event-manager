@@ -1,5 +1,4 @@
-import Card from 'react-bootstrap/Card';
-import { ListGroup } from 'react-bootstrap';
+import { ListGroup, Card } from 'react-bootstrap';
 import type { EventData } from '~/utils/types';
 import { Link } from 'react-router';
 
@@ -11,7 +10,7 @@ export default function EventCard({
   image_path,
 }: EventData) {
   const eventPath = '/attendee/events/' + id;
-  const imageURL = 'http://localhost:3000/images/' + image_path;
+  const imageURL = import.meta.env.VITE_API_URL + '/images/' + image_path;
 
   return (
     <Card className="card" id="event-card">

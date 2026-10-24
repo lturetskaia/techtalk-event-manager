@@ -1,5 +1,4 @@
-import Card from 'react-bootstrap/Card';
-import { ListGroup } from 'react-bootstrap';
+import { ListGroup, Card } from 'react-bootstrap';
 import type { UserTicketData } from '~/utils/types';
 import { NavLink } from 'react-router';
 
@@ -12,7 +11,7 @@ export default function TicketCard({ ticket }: { ticket: UserTicketData }) {
 
       <div className="img-container">
         <img
-          src="/sample-qr-code.png"
+          src="https://teapod.dev/api/sample-qr-code.png"
           className="card-img-top"
           id="qr-image"
           alt="A ticket QR code"

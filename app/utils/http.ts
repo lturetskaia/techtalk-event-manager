@@ -1,7 +1,7 @@
 import type { BookingData, LoginData, UserDetails, SignupData } from './types';
 
 async function getData(path: string) {
-  const url = `http://localhost:3000${path}`;
+  const url = import.meta.env.VITE_API_URL + path;
   const response = await fetch(url, {
     method: 'GET',
     credentials: 'include', //Required to send session cookies on page reload!
@@ -24,7 +24,7 @@ async function postData(
   data:
     LoginData | BookingData | UserDetails | SignupData | undefined = undefined,
 ) {
-  const url = `http://localhost:3000${path}`;
+  const url = import.meta.env.VITE_API_URL + path;
   const response = await fetch(url, {
     method: 'POST',
     credentials: 'include',
@@ -44,7 +44,7 @@ async function postData(
 }
 
 async function postMultipartData(path: string, data: FormData) {
-  const url = `http://localhost:3000${path}`;
+  const url = import.meta.env.VITE_API_URL + path;
   const response = await fetch(url, {
     method: 'POST',
     credentials: 'include',
@@ -61,7 +61,7 @@ async function postMultipartData(path: string, data: FormData) {
 }
 
 async function deleteEventData(path: string) {
-  const url = `http://localhost:3000${path}`;
+  const url = import.meta.env.VITE_API_URL + path;
   const response = await fetch(url, {
     method: 'DELETE',
     credentials: 'include', //Required to send session cookies on page reload!
